@@ -81,6 +81,7 @@ USAGE
 * [`slp-cli-wallet burn-tokens`](#slp-cli-wallet-burn-tokens)
 * [`slp-cli-wallet create-wallet`](#slp-cli-wallet-create-wallet)
 * [`slp-cli-wallet derivation`](#slp-cli-wallet-derivation)
+* [`slp-cli-wallet fund-test-wallet`](#slp-cli-wallet-fund-test-wallet)
 * [`slp-cli-wallet get-address`](#slp-cli-wallet-get-address)
 * [`slp-cli-wallet get-key`](#slp-cli-wallet-get-key)
 * [`slp-cli-wallet hello`](#slp-cli-wallet-hello)
@@ -149,6 +150,26 @@ DESCRIPTION
 ```
 
 _See code: [src/commands/derivation.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/derivation.js)_
+
+## `slp-cli-wallet fund-test-wallet`
+
+Prepares wallet to run benchmark test
+
+```
+USAGE
+  $ slp-cli-wallet fund-test-wallet
+
+OPTIONS
+  -d, --dest=dest  destination wallet name, to send funds to
+  -n, --name=name  source wallet name to source funds
+
+DESCRIPTION
+  ...
+  This is a long-running command that funds a new wallet and prepares it to run
+  a benchmark test of the BCH infrastructure.
+```
+
+_See code: [src/commands/fund-test-wallet.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/fund-test-wallet.js)_
 
 ## `slp-cli-wallet get-address`
 
