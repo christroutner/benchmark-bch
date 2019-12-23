@@ -63,7 +63,8 @@ if (RESTAPI === "local") {
   // config.TESTNET_REST = `http://192.168.0.38:13400/v3/`
   config.MAINNET_REST = `http://127.0.0.1:3000/v3/`
   // config.TESTNET_REST = `http://decatur.hopto.org:13400/v3/`
-  config.TESTNET_REST = `https://testnet.bchjs.cash/v3/`
+  // config.TESTNET_REST = `https://testnet.bchjs.cash/v3/`
+  config.TESTNET_REST = `http://127.0.0.1:4000/v3/`
   config.RESTAPI = "local"
 }
 
