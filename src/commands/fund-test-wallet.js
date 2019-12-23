@@ -27,7 +27,7 @@ const BITBOX = new config.BCHLIB({
 })
 
 // The number of addresses to fund for the test.
-const NUMBER_OF_ADDRESSES = 3
+const NUMBER_OF_ADDRESSES = 300
 
 // Amount of BCH to send to each address.
 const BCH_TO_SEND = 0.00002
@@ -96,11 +96,6 @@ class FundTest extends Command {
         this.send.BITBOX = this.BITBOX
       }
 
-      // Update balances before sending.
-      // const updateBalances = new UpdateBalances()
-      // updateBalances.BITBOX = this.BITBOX
-      // sourceWalletInfo = await updateBalances.updateBalances(flags)
-
       // Generate 300 addresses from the test wallet.
       const addresses = await this.generateAddresses(
         destWalletInfo,
@@ -125,7 +120,10 @@ class FundTest extends Command {
       // Add each transaction to a queue with automatic retry.
       for (let i = 0; i < addresses.length; i++) {
         const address = addresses[i]
+        console.log(`funding index ${i}, address ${address}`)
 
+        // Load the state. p-retry functions can't pass arguments, so they
+        // are passed this way.
         _this.queueState = {
           walletInfo,
           bch: BCH_TO_SEND,
@@ -141,10 +139,12 @@ class FundTest extends Command {
           retries: 5 // Retry 5 times
         })
 
-        console.log(`Successfully funded address ${address}, TXID: ${txid}`)
+        console.log(`Successfully funded address ${address}`)
+        console.log(`TXID: ${txid}`)
+        console.log(" ")
         console.log(" ")
 
-        await _this.sleep(60000 * 2) // Wait some period of time before sending next tx.
+        await _this.sleep(60000 * 1) // Wait some period of time before sending next tx.
       }
     } catch (err) {
       console.log(`Error in fund-test-wallet.js/fundAddresses()`)
@@ -162,6 +162,7 @@ class FundTest extends Command {
   // auto-retry if there is an error.
   async generateTx() {
     try {
+      // Retrieve the state. p-rety functions can't pass arguments.
       let { walletInfo, bch, addr } = _this.queueState
 
       // Update the wallet
