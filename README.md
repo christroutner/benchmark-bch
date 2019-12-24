@@ -92,6 +92,7 @@ USAGE
 * [`slp-cli-wallet send-all`](#slp-cli-wallet-send-all)
 * [`slp-cli-wallet send-tokens`](#slp-cli-wallet-send-tokens)
 * [`slp-cli-wallet sweep`](#slp-cli-wallet-sweep)
+* [`slp-cli-wallet tokenize-test-wallet`](#slp-cli-wallet-tokenize-test-wallet)
 * [`slp-cli-wallet update-balances`](#slp-cli-wallet-update-balances)
 
 ## `slp-cli-wallet burn-tokens`
@@ -338,6 +339,26 @@ DESCRIPTION
 ```
 
 _See code: [src/commands/sweep.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/sweep.js)_
+
+## `slp-cli-wallet tokenize-test-wallet`
+
+Prepares wallet to run benchmark test
+
+```
+USAGE
+  $ slp-cli-wallet tokenize-test-wallet
+
+OPTIONS
+  -d, --dest=dest  destination wallet name, to send funds to
+  -n, --name=name  source wallet name to source funds
+
+DESCRIPTION
+  ...
+  This is a long-running command that funds a new wallet and prepares it to run
+  a benchmark test of the BCH infrastructure.
+```
+
+_See code: [src/commands/tokenize-test-wallet.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/tokenize-test-wallet.js)_
 
 ## `slp-cli-wallet update-balances`
 

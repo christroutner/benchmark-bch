@@ -2,7 +2,8 @@
   Reference:
   https://docs.google.com/document/d/1qtleJjNQ7b8v--RBEN17p56HqtHf9j4Bvtap4YRLXBs/edit#heading=h.vjv6nnxj3xmw
 
-  This command funds a test wallet and prepars it for running a benchmark test.
+  This command is based on the fund-test-wallet command. It should be run after
+  running that command. This command sends 1 token to each of the addresses.
 */
 
 "use strict"
@@ -15,8 +16,11 @@ const appUtils = new AppUtils()
 const Send = require("./send")
 const send = new Send()
 
-const GetAddress = require("./get-address")
-const getAddress = new GetAddress()
+// const GetAddress = require("./get-address")
+// const getAddress = new GetAddress()
+
+const SendTokens = require("./send-tokens")
+const sendTokens = new SendTokens()
 
 const UpdateBalances = require("./update-balances")
 
@@ -29,8 +33,7 @@ const BITBOX = new config.BCHLIB({
 // The number of addresses to fund for the test.
 const NUMBER_OF_ADDRESSES = 10
 
-// Amount of BCH to send to each address.
-const BCH_TO_SEND = 0.00002
+const TOKEN_ID = `155784a206873c98acc09e8dabcccf6abf13c4c14d8662190534138a16bb93ce`
 
 const pRetry = require("p-retry")
 
@@ -52,6 +55,8 @@ class FundTest extends Command {
     this.send = send
     this.send.appUtils = this.appUtils
 
+    this.sendTokens = sendTokens
+
     this.queueState = {}
 
     _this = this
@@ -67,14 +72,14 @@ class FundTest extends Command {
       this.flags = flags
 
       // Fund the wallet
-      await this.fundTestWallet(flags)
+      await this.tokenizeTestWallet(flags)
     } catch (err) {
       console.log(`Error in fund-test-wallet: `, err)
     }
   }
 
   // Parent function that starts funding.
-  async fundTestWallet(flags) {
+  async tokenizeTestWallet(flags) {
     try {
       const source = flags.name // Name of the source wallet.
       const dest = flags.dest // Name of the destination wallet.
@@ -126,7 +131,6 @@ class FundTest extends Command {
         // are passed this way.
         _this.queueState = {
           walletInfo,
-          bch: BCH_TO_SEND,
           addr: address
         }
 
@@ -139,7 +143,7 @@ class FundTest extends Command {
           retries: 5 // Retry 5 times
         })
 
-        console.log(`Successfully funded address ${address}`)
+        console.log(`Successfully send a token to ${address}`)
         console.log(`TXID: ${txid}`)
         console.log(" ")
         console.log(" ")
@@ -163,30 +167,44 @@ class FundTest extends Command {
   async generateTx() {
     try {
       // Retrieve the state. p-rety functions can't pass arguments.
-      let { walletInfo, bch, addr } = _this.queueState
+      let { walletInfo, addr } = _this.queueState
 
       // Update the wallet
       walletInfo = await _this.updateBalances.updateBalances(_this.flags)
 
+      // Get a list of token UTXOs from the wallet for this token.
+      const tokenUtxos = _this.sendTokens.getTokenUtxos(TOKEN_ID, walletInfo)
+      // console.log(`tokenUtxos: ${JSON.stringify(tokenUtxos, null, 2)}`)
+
       // Get info on UTXOs controlled by this wallet.
-      const utxos = await _this.appUtils.getUTXOs(walletInfo)
-      // console.log(`send utxos: ${JSON.stringify(utxos, null, 2)}`)
+      const utxos = await _this.sendTokens.getBchUtxos(walletInfo)
+      // console.log(`bch utxos: ${JSON.stringify(utxos, null, 2)}`)
 
       // Select optimal UTXO
-      const utxo = await _this.send.selectUTXO(bch, utxos)
+      const utxo = await _this.send.selectUTXO(0.000015, utxos)
       // console.log(`selected utxo: ${JSON.stringify(utxo, null, 2)}`)
 
       if (!utxo.txid) throw new Error(`No valid UTXO could be found`)
 
+      // Exit if there is no UTXO big enough to fulfill the transaction.
+      if (!utxo.amount) {
+        this.log(
+          `Could not find a UTXO big enough for this transaction. More BCH needed.`
+        )
+        return
+      }
+
       // For now, change is sent to the root address of the source wallet.
       const changeAddr = walletInfo.rootAddress
 
-      const hex = await _this.send.sendBCH(
+      // Send the token, transfer change to the new address
+      const hex = await _this.sendTokens.sendTokens(
         utxo,
-        bch,
+        1,
         changeAddr,
         addr,
-        walletInfo
+        walletInfo,
+        tokenUtxos
       )
 
       const txid = await _this.appUtils.broadcastTx(hex)
