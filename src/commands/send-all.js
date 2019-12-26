@@ -213,7 +213,11 @@ https://bit.ly/2TnhdVc
 
 SendAll.flags = {
   name: flags.string({ char: "n", description: "Name of wallet" }),
-  sendAddr: flags.string({ char: "a", description: "Cash address to send to" })
+  sendAddr: flags.string({ char: "a", description: "Cash address to send to" }),
+  ignoreTokens: flags.boolean({
+    char: "i",
+    description: "Ignore and burn tokens"
+  })
 }
 
 module.exports = SendAll

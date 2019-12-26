@@ -15,6 +15,9 @@ const appUtils = new AppUtils()
 const Send = require("./send")
 const send = new Send()
 
+const SendTokens = require("./send-tokens")
+const sendTokens = new SendTokens()
+
 // const GetAddress = require("./get-address")
 // const getAddress = new GetAddress()
 
@@ -27,7 +30,7 @@ const BITBOX = new config.BCHLIB({
 })
 
 // The number of addresses to fund for the test.
-const NUMBER_OF_ADDRESSES = 10
+const NUMBER_OF_ADDRESSES = 3
 
 const TOKEN_ID = `155784a206873c98acc09e8dabcccf6abf13c4c14d8662190534138a16bb93ce`
 
@@ -56,6 +59,8 @@ class FundTest extends Command {
 
     this.send = send
     this.send.appUtils = this.appUtils
+
+    this.sendTokens = sendTokens
 
     _this = this
   }
@@ -93,13 +98,28 @@ class FundTest extends Command {
         this.send.BITBOX = this.BITBOX
       }
 
-      // Generate 300 addresses from the test wallet.
+      // Generate addresses from the test wallet.
       const addresses = await this.generateAddresses(
         sourceWalletInfo,
         NUMBER_OF_ADDRESSES
       )
       console.log(`addresses: ${JSON.stringify(addresses, null, 2)}`)
 
+      // Loop through each address and generate a transaction for each one.
+      // Add each transaction to a queue with automatic retry.
+      for (let i = 0; i < addresses.length; i++) {
+        const address = addresses[i]
+
+        const txid = await this.generateTx(sourceWalletInfo, address, i)
+        console.log(`Tokens sent with TXID: ${txid}`)
+
+        await _this.sleep(TIME_BETWEEN_TXS) // Sleep between txs.
+        console.log(" ")
+
+        txCnt++
+      }
+
+      /*
       // Update the balances in the test wallet.
       walletInfo = await _this.updateBalances.updateBalances(_this.flags)
 
@@ -138,9 +158,13 @@ class FundTest extends Command {
         await _this.sleep(TIME_BETWEEN_TXS) // Wait some period of time before sending next tx.
       }
       // Add each transaction to the queue.
+
+*/
+      console.log(`test complete. txCnt: ${txCnt}, errorCnt: ${errorCnt}`)
     } catch (err) {
-      console.log(`Error in fundTestWallet()`)
-      throw err
+      // console.log(`Error in fundTestWallet()`)
+      // throw err
+      errorCnt++
     }
   }
 
@@ -150,20 +174,33 @@ class FundTest extends Command {
   }
 
   // Returns a promise that resolves to a txid string
-  // The intention is for the promise to be added to a retry-queue that will
-  // auto-retry if there is an error.
-  async generateTx(walletInfo, addr) {
+  // This function runs a series of commands that correspond to the transaction
+  // model in the appendix 2 of the test document.
+  async generateTx(walletInfo, addr, walletIndex) {
     try {
+      // Get the address balance
+      const balance = await _this.BITBOX.Blockbook.balance(addr)
+      console.log(`BCH balance for address ${addr}: ${balance.balance}`)
+
+      // Get the SLP balance for the address.
+      const tokenBalance = await _this.BITBOX.SLP.Utils.balancesForAddress(addr)
+      // console.log(`token balance: ${JSON.stringify(tokenBalance, null, 2)}`)
+      console.log(`token balance: ${tokenBalance[0].balance}`)
+
+      // Get utxos
+      const utxos = await _this.BITBOX.Blockbook.utxo(addr)
+      // console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
+
       // Get a list of token UTXOs from the wallet for this token.
-      const tokenUtxos = _this.sendTokens.getTokenUtxos(TOKEN_ID, walletInfo)
+      // const tokenUtxos = _this.sendTokens.getTokenUtxos(TOKEN_ID, walletInfo)
+      let tokenUtxos = await _this.BITBOX.SLP.Utils.tokenUtxoDetails(utxos)
+      tokenUtxos = tokenUtxos.filter(x => x)
+      tokenUtxos[0].hdIndex = walletIndex // Expected by sendTokens()
       // console.log(`tokenUtxos: ${JSON.stringify(tokenUtxos, null, 2)}`)
 
-      // Get info on UTXOs controlled by this wallet.
-      const utxos = await _this.sendTokens.getBchUtxos(walletInfo)
-      // console.log(`bch utxos: ${JSON.stringify(utxos, null, 2)}`)
-
-      // Select optimal UTXO
-      const utxo = await _this.send.selectUTXO(0.000015, utxos)
+      // Select optimal BCH UTXO
+      const utxo = await _this.send.selectUTXO(0.00001, utxos)
+      utxo.hdIndex = walletIndex // Expected by sendTokens()
       // console.log(`selected utxo: ${JSON.stringify(utxo, null, 2)}`)
 
       if (!utxo.txid) throw new Error(`No valid UTXO could be found`)
@@ -175,6 +212,13 @@ class FundTest extends Command {
         )
         return
       }
+
+      // Pad the test with extra calls to make it more closely resemble the
+      // 'ideal' transaction from the test document.
+      await _this.BITBOX.Blockbook.balance(addr)
+      await _this.BITBOX.SLP.Utils.balancesForAddress(addr)
+      await _this.BITBOX.Blockbook.utxo(addr)
+      await _this.BITBOX.Blockbook.utxo(addr)
 
       // For now, change is sent to the root address of the source wallet.
       const changeAddr = walletInfo.rootAddress
@@ -188,13 +232,14 @@ class FundTest extends Command {
         walletInfo,
         tokenUtxos
       )
+      // console.log(`hex: ${hex}`)
 
       const txid = await _this.appUtils.broadcastTx(hex)
 
       return txid
     } catch (err) {
-      console.log(`Error in fund-test-wallet.js/generateTx: `, err)
-      throw new Error(`Error caught in generateTx()`)
+      console.log(`Error in run-test.js/generateTx for address ${addr}: `, err)
+      // throw new Error(`Error caught in generateTx()`)
       // throw err
     }
   }
@@ -252,18 +297,20 @@ class FundTest extends Command {
     if (!name || name === "")
       throw new Error(`You must specify a source wallet with the -n flag.`)
 
-    const dest = flags.dest
-    if (!dest || dest === "")
-      throw new Error(`You must specify a destination wallet with the -d flag.`)
-
     return true
   }
 }
 
-FundTest.description = `Prepares wallet to run benchmark test
+FundTest.description = `Runs the benchmark test
 ...
-This is a long-running command that funds a new wallet and prepares it to run
-a benchmark test of the BCH infrastructure.
+This command assumes that the wallet has been prepped to run the test by first
+running these commands:
+- fund-test-wallet
+- tokenize-test-wallet
+- update-balances
+
+After running the above commands in that order, the wallet will then be prepared
+to run this command, which executes the benchmark test.
 `
 
 FundTest.flags = {
