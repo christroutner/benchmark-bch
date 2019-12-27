@@ -9,5 +9,4 @@ wallets/*.json
 /coverage
 orbitdb/
 
-*.json
 json/

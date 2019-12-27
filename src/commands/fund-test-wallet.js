@@ -27,12 +27,12 @@ const BITBOX = new config.BCHLIB({
 })
 
 // The number of addresses to fund for the test.
-const NUMBER_OF_ADDRESSES = 3
+const NUMBER_OF_ADDRESSES = 300
 
 // Amount of BCH to send to each address.
 const BCH_TO_SEND = 0.00002
 
-const TIME_BETWEEN_TXS = 30000
+const TIME_BETWEEN_TXS = 60000 * 2
 
 const pRetry = require("p-retry")
 
@@ -133,9 +133,16 @@ class FundTest extends Command {
         }
 
         const txid = await pRetry(_this.generateTx, {
-          onFailedAttempt: async () => {
+          onFailedAttempt: async error => {
             //   failed attempt.
-            console.log("P-retry error")
+            console.log(" ")
+            console.log(
+              `Attempt ${error.attemptNumber} failed. There are ${
+                error.retriesLeft
+              } retries left. Waiting ${TIME_BETWEEN_TXS /
+                60000} minutes before trying again.`
+            )
+            console.log(" ")
             await _this.sleep(TIME_BETWEEN_TXS) // Sleep for 2 minutes
           },
           retries: 5 // Retry 5 times
