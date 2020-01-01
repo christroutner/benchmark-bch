@@ -108,7 +108,7 @@ class FundTest extends Command {
       // Loop through each address and generate a transaction for each one.
       // Add each transaction to a queue with automatic retry.
       // for (let i = 0; i < addresses.length; i++) {
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < 4; i++) {
         try {
           const address = addresses[i]
 
