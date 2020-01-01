@@ -140,7 +140,7 @@ class SendAll extends Command {
       let redeemScript
 
       // Loop through each input and sign
-      for (var i = 0; i < utxos.length; i++) {
+      for (var i = 0; i < iterLnth; i++) {
         const utxo = utxos[i]
 
         // Generate a keypair for the current address.
