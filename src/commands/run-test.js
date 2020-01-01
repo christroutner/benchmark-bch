@@ -32,7 +32,7 @@ const BITBOX = new config.BCHLIB({
 // The number of addresses to fund for the test.
 const NUMBER_OF_ADDRESSES = 300
 
-const TOKEN_ID = `155784a206873c98acc09e8dabcccf6abf13c4c14d8662190534138a16bb93ce`
+const TOKEN_ID = `e0f65c4336cdf90589600e34bcf99c77e9a6e0c7d2d3e266c8f4ab9a5383938e`
 
 const TIME_BETWEEN_TXS = 1000 // time in milliseconds
 
@@ -107,7 +107,8 @@ class FundTest extends Command {
 
       // Loop through each address and generate a transaction for each one.
       // Add each transaction to a queue with automatic retry.
-      for (let i = 0; i < addresses.length; i++) {
+      // for (let i = 0; i < addresses.length; i++) {
+      for (let i = 0; i < 3; i++) {
         const address = addresses[i]
 
         const txid = await this.generateTx(sourceWalletInfo, address, i)
@@ -119,47 +120,6 @@ class FundTest extends Command {
         txCnt++
       }
 
-      /*
-      // Update the balances in the test wallet.
-      walletInfo = await _this.updateBalances.updateBalances(_this.flags)
-
-      // Loop through each address and generate a transaction for each one.
-      // Add each transaction to a queue with automatic retry.
-      for (let i = 0; i < addresses.length; i++) {
-        const address = addresses[i]
-        console.log(
-          `Spending tokens with wallet index ${i}, address ${address}`
-        )
-
-        const txid = await pRetry(() => _this.generateTx(walletInfo, address), {
-          onFailedAttempt: async () => {
-            //   failed attempt.
-            console.log(" ")
-            console.log(
-              `Attempt ${error.attemptNumber} failed. There are ${
-                error.retriesLeft
-              } retries left. Waiting ${TIME_BETWEEN_TXS /
-                1000} seconds before trying again.`
-            )
-            console.log(" ")
-
-            errorCnt++
-            await _this.sleep(TIME_BETWEEN_TXS) // Sleep for 2 minutes
-          },
-          retries: 5 // Retry 5 times
-        })
-
-        console.log(`Successfully spend tokens at address ${address}`)
-        console.log(`TXID: ${txid}`)
-        console.log(" ")
-        console.log(" ")
-        txCnt++
-
-        await _this.sleep(TIME_BETWEEN_TXS) // Wait some period of time before sending next tx.
-      }
-      // Add each transaction to the queue.
-
-*/
       console.log(`test complete. txCnt: ${txCnt}, errorCnt: ${errorCnt}`)
     } catch (err) {
       // console.log(`Error in fundTestWallet()`)
@@ -201,7 +161,7 @@ class FundTest extends Command {
       // Select optimal BCH UTXO
       const utxo = await _this.send.selectUTXO(0.00001, utxos)
       utxo.hdIndex = walletIndex // Expected by sendTokens()
-      // console.log(`selected utxo: ${JSON.stringify(utxo, null, 2)}`)
+      console.log(`selected utxo: ${JSON.stringify(utxo, null, 2)}`)
 
       if (!utxo.txid) throw new Error(`No valid UTXO could be found`)
 
