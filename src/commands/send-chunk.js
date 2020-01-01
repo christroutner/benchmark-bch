@@ -105,7 +105,7 @@ class SendAll extends Command {
 
       // Calulate the original amount in the wallet and add all UTXOs to the
       // transaction builder.
-      for (var i = 0; i < iterLngth; i++) {
+      for (var i = 0; i < iterLnth; i++) {
         const utxo = utxos[i]
 
         originalAmount = originalAmount + utxo.satoshis
