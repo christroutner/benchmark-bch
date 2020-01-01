@@ -101,7 +101,7 @@ class SendAll extends Command {
 
       let iterLnth = 0
       if (utxos.length < 50) iterLnth = utxos.length
-      else iterLnth = 50
+      else iterLnth = 100
 
       // Calulate the original amount in the wallet and add all UTXOs to the
       // transaction builder.
@@ -124,7 +124,7 @@ class SendAll extends Command {
         { P2PKH: utxos.length },
         { P2PKH: 1 }
       )
-      const fee = Math.ceil(1.1 * byteCount)
+      const fee = Math.ceil(1.01 * byteCount)
       console.log(`fee: ${byteCount}`)
 
       // amount to send to receiver. It's the original amount - 1 sat/byte for tx size
