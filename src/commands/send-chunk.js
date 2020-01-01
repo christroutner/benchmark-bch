@@ -125,11 +125,13 @@ class SendAll extends Command {
         { P2PKH: 1 }
       )
       const fee = Math.ceil(1.1 * byteCount)
-      //console.log(`fee: ${byteCount}`)
+      console.log(`fee: ${byteCount}`)
 
       // amount to send to receiver. It's the original amount - 1 sat/byte for tx size
       const sendAmount = originalAmount - fee
-      //console.log(`sendAmount: ${sendAmount}`)
+      console.log(`sendAmount: ${sendAmount}`)
+
+      if (sendAmount < 546) throw new Error(`Send amount is lower than dust`)
 
       // add output w/ address and amount to send
       transactionBuilder.addOutput(
