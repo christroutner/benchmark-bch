@@ -91,6 +91,7 @@ USAGE
 * [`slp-cli-wallet run-test`](#slp-cli-wallet-run-test)
 * [`slp-cli-wallet send`](#slp-cli-wallet-send)
 * [`slp-cli-wallet send-all`](#slp-cli-wallet-send-all)
+* [`slp-cli-wallet send-chunk`](#slp-cli-wallet-send-chunk)
 * [`slp-cli-wallet send-tokens`](#slp-cli-wallet-send-tokens)
 * [`slp-cli-wallet sweep`](#slp-cli-wallet-sweep)
 * [`slp-cli-wallet tokenize-test-wallet`](#slp-cli-wallet-tokenize-test-wallet)
@@ -313,6 +314,7 @@ USAGE
 
 OPTIONS
   -a, --sendAddr=sendAddr  Cash address to send to
+  -i, --ignoreTokens       Ignore and burn tokens
   -n, --name=name          Name of wallet
 
 DESCRIPTION
@@ -325,6 +327,30 @@ DESCRIPTION
 ```
 
 _See code: [src/commands/send-all.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/send-all.js)_
+
+## `slp-cli-wallet send-chunk`
+
+Send all BCH in a wallet to another address. **Degrades Privacy**
+
+```
+USAGE
+  $ slp-cli-wallet send-chunk
+
+OPTIONS
+  -a, --sendAddr=sendAddr  Cash address to send to
+  -i, --ignoreTokens       Ignore and burn tokens
+  -n, --name=name          Name of wallet
+
+DESCRIPTION
+  Send all BCH in a wallet to another address.
+
+  This method has a negative impact on privacy by linking all addresses in a
+  wallet. If privacy of a concern, CoinJoin should be used.
+  This is a good article describing the privacy concerns:
+  https://bit.ly/2TnhdVc
+```
+
+_See code: [src/commands/send-chunk.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/send-chunk.js)_
 
 ## `slp-cli-wallet send-tokens`
 
@@ -395,7 +421,8 @@ USAGE
   $ slp-cli-wallet update-balances
 
 OPTIONS
-  -n, --name=name  Name of wallet
+  -i, --ignoreTokens  Ignore and burn tokens
+  -n, --name=name     Name of wallet
 ```
 
 _See code: [src/commands/update-balances.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/update-balances.js)_
