@@ -101,7 +101,7 @@ class SendAll extends Command {
 
       let iterLnth = 0
       if (utxos.length < 50) iterLnth = utxos.length
-      else iterLngth = 50
+      else iterLnth = 50
 
       // Calulate the original amount in the wallet and add all UTXOs to the
       // transaction builder.
