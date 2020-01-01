@@ -117,7 +117,7 @@ class SendAll extends Command {
         throw new Error(`Original amount is zero. No BCH to send.`)
 
       // original amount of satoshis in vin
-      //console.log(`originalAmount: ${originalAmount}`)
+      console.log(`originalAmount: ${originalAmount}`)
 
       // get byte count to calculate fee. paying 1 sat/byte
       const byteCount = this.BITBOX.BitcoinCash.getByteCount(
