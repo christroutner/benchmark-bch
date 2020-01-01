@@ -109,15 +109,21 @@ class FundTest extends Command {
       // Add each transaction to a queue with automatic retry.
       // for (let i = 0; i < addresses.length; i++) {
       for (let i = 0; i < 3; i++) {
-        const address = addresses[i]
+        try {
+          const address = addresses[i]
 
-        const txid = await this.generateTx(sourceWalletInfo, address, i)
-        console.log(`Tokens sent with TXID: ${txid}`)
+          const txid = await this.generateTx(sourceWalletInfo, address, i)
+          console.log(`Tokens sent with TXID: ${txid}`)
 
-        await _this.sleep(TIME_BETWEEN_TXS) // Sleep between txs.
-        console.log(" ")
+          await _this.sleep(TIME_BETWEEN_TXS) // Sleep between txs.
+          console.log(" ")
 
-        txCnt++
+          txCnt++
+        } catch (err) {
+          console.log(`Error on iteration ${i}`)
+          errorCnt++
+          continue
+        }
       }
 
       console.log(`test complete. txCnt: ${txCnt}, errorCnt: ${errorCnt}`)
@@ -200,7 +206,7 @@ class FundTest extends Command {
     } catch (err) {
       console.log(`Error in run-test.js/generateTx for address ${addr}: `, err)
       // throw new Error(`Error caught in generateTx()`)
-      // throw err
+      throw err
     }
   }
 
