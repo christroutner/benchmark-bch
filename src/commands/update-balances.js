@@ -341,7 +341,10 @@ class UpdateBalances extends Command {
         // console.log(`thisAddress: ${JSON.stringify(thisAddress, null, 2)}`)
 
         // Get all SLP token UTXOs associated with this address.
-        const tokenUtxos = await this.findSlpUtxos(thisAddress)
+        let tokenUtxos = []
+        try {
+          tokenUtxos = await this.findSlpUtxos(thisAddress)
+        } catch (err) {}
         // const tokenUtxos = [] // Empty array to force-ignore tokens.
         // console.log(`tokenUtxos: ${JSON.stringify(tokenUtxos, null, 2)}`)
 
