@@ -192,7 +192,7 @@ class FundTest extends Command {
         walletInfo,
         tokenUtxos
       )
-      // console.log(`hex: ${hex}`)
+      console.log(`hex: ${hex}`)
 
       const txid = await _this.appUtils.broadcastTx(hex)
 
