@@ -107,8 +107,8 @@ class FundTest extends Command {
 
       // Loop through each address and generate a transaction for each one.
       // Add each transaction to a queue with automatic retry.
-      // for (let i = 0; i < addresses.length; i++) {
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < addresses.length; i++) {
+        // for (let i = 0; i < 4; i++) {
         try {
           const address = addresses[i]
 
@@ -167,7 +167,7 @@ class FundTest extends Command {
       // Select optimal BCH UTXO
       const utxo = await _this.send.selectUTXO(0.00001, utxos)
       utxo.hdIndex = walletIndex // Expected by sendTokens()
-      console.log(`selected utxo: ${JSON.stringify(utxo, null, 2)}`)
+      // console.log(`selected utxo: ${JSON.stringify(utxo, null, 2)}`)
 
       if (!utxo.txid) throw new Error(`No valid UTXO could be found`)
 
@@ -198,7 +198,7 @@ class FundTest extends Command {
         walletInfo,
         tokenUtxos
       )
-      console.log(`hex: ${hex}`)
+      // console.log(`hex: ${hex}`)
 
       const txid = await _this.appUtils.broadcastTx(hex)
 
