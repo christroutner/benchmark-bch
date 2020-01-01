@@ -33,7 +33,7 @@ const BITBOX = new config.BCHLIB({
 // The number of addresses to fund for the test.
 const NUMBER_OF_ADDRESSES = 300
 
-const TOKEN_ID = `155784a206873c98acc09e8dabcccf6abf13c4c14d8662190534138a16bb93ce`
+const TOKEN_ID = `e0f65c4336cdf90589600e34bcf99c77e9a6e0c7d2d3e266c8f4ab9a5383938e`
 
 const TIME_BETWEEN_TXS = 60000 * 2
 
@@ -137,7 +137,7 @@ class FundTest extends Command {
         }
 
         const txid = await pRetry(_this.generateTx, {
-          onFailedAttempt: async () => {
+          onFailedAttempt: async error => {
             //   failed attempt.
             console.log(" ")
             console.log(
@@ -149,7 +149,7 @@ class FundTest extends Command {
             console.log(" ")
             await _this.sleep(TIME_BETWEEN_TXS) // Sleep for 2 minutes
           },
-          retries: 5 // Retry 5 times
+          retries: 20 // Retry 5 times
         })
 
         console.log(`Successfully send a token to ${address}`)

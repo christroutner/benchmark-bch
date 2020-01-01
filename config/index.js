@@ -11,7 +11,7 @@
 
 // By default choose a local rest API.
 // let RESTAPI = "rest.bitcoin.com"
-let RESTAPI = "bchjs"
+let RESTAPI = "local"
 
 // Override the RESTAPI setting if envronment variable is set.
 if (process.env.RESTAPI && process.env.RESTAPI !== "")

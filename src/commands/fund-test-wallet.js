@@ -145,7 +145,7 @@ class FundTest extends Command {
             console.log(" ")
             await _this.sleep(TIME_BETWEEN_TXS) // Sleep for 2 minutes
           },
-          retries: 5 // Retry 5 times
+          retries: 20 // Retry 5 times
         })
 
         console.log(`Successfully funded address ${address}`)
