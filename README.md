@@ -96,6 +96,7 @@ USAGE
 * [`slp-cli-wallet sweep`](#slp-cli-wallet-sweep)
 * [`slp-cli-wallet tokenize-test-wallet`](#slp-cli-wallet-tokenize-test-wallet)
 * [`slp-cli-wallet update-balances`](#slp-cli-wallet-update-balances)
+* [`slp-cli-wallet update2`](#slp-cli-wallet-update2)
 
 ## `slp-cli-wallet burn-tokens`
 
@@ -426,4 +427,19 @@ OPTIONS
 ```
 
 _See code: [src/commands/update-balances.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/update-balances.js)_
+
+## `slp-cli-wallet update2`
+
+Poll the network and update the balances of the wallet.
+
+```
+USAGE
+  $ slp-cli-wallet update2
+
+OPTIONS
+  -i, --ignoreTokens  Ignore and burn tokens
+  -n, --name=name     Name of wallet
+```
+
+_See code: [src/commands/update2.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/update2.js)_
 <!-- commandsstop -->
