@@ -11,7 +11,7 @@
 
 // By default choose a local rest API.
 // let RESTAPI = "rest.bitcoin.com"
-let RESTAPI = "bchjs"
+let RESTAPI = "bt"
 
 // Override the RESTAPI setting if envronment variable is set.
 if (process.env.RESTAPI && process.env.RESTAPI !== "")
@@ -38,6 +38,15 @@ if (RESTAPI === "bchjs") {
   config.MAINNET_REST = `https://wallet.bchjs.cash/v3/`
   config.TESTNET_REST = `https://twallet.bchjs.cash/v3/`
   config.RESTAPI = "bchjs"
+}
+
+if (RESTAPI === "bt") {
+  config.BCHLIB = BCHJS.BitboxShim()
+  // config.MAINNET_REST = `https://api.bchjs.cash/v3/`
+  // config.TESTNET_REST = `https://tapi.bchjs.cash/v3/`
+  config.MAINNET_REST = `http://104.248.234.26:3000/v3/`
+  config.TESTNET_REST = `http://104.248.234.26:4000/v3/`
+  config.RESTAPI = "bt"
 }
 
 // Use BITBOX and the bitcoin.com infrastructure.

@@ -58,6 +58,11 @@ class AppUtils {
           // Add the HD node index to the UTXO for use later.
           thisUTXO.hdIndex = walletInfo.hasBalance[i].index
 
+          // Add the addresses.
+          thisUTXO.cashAddr = thisAddr
+          thisUTXO.legacyAddr = this.BITBOX.Address.toLegacyAddress(thisAddr)
+          thisUTXO.slpAddr = this.BITBOX.SLP.Address.toSLPAddress(thisAddr)
+
           // Only check against SLP UTXOs, if hte SLPUtxos array exists.
           if (walletInfo.SLPUtxos) {
             // Determine if this UTXO is in the token UTXO list.

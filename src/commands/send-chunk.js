@@ -101,12 +101,14 @@ class SendAll extends Command {
 
       let iterLnth = 0
       if (utxos.length < 50) iterLnth = utxos.length
-      else iterLnth = 100
+      else iterLnth = 50
 
       // Calulate the original amount in the wallet and add all UTXOs to the
       // transaction builder.
       for (var i = 0; i < iterLnth; i++) {
         const utxo = utxos[i]
+
+        if (i < 5) console.log(`utxo: ${JSON.stringify(utxo, null, 2)}`)
 
         originalAmount = originalAmount + utxo.satoshis
 
