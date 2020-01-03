@@ -45,7 +45,7 @@ if (RESTAPI === "bt") {
   // config.MAINNET_REST = `https://api.bchjs.cash/v3/`
   // config.TESTNET_REST = `https://tapi.bchjs.cash/v3/`
   config.MAINNET_REST = `http://104.248.234.26:3000/v3/`
-  config.TESTNET_REST = `http://104.248.234.26:4000/v3/`
+  config.TESTNET_REST = `https://twallet.bchjs.cash/v3/`
   config.RESTAPI = "bt"
 }
 

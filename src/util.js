@@ -56,6 +56,7 @@ class AppUtils {
           //console.log(`thisUTXO: ${util.inspect(thisUTXO)}`)
 
           // Add the HD node index to the UTXO for use later.
+          // NOTE: This number can not be trusted to be accurate.
           thisUTXO.hdIndex = walletInfo.hasBalance[i].index
 
           // Add the addresses.

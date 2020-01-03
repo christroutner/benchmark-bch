@@ -84,7 +84,7 @@ class UpdateBalances extends Command {
         walletInfo,
         flags.ignoreTokens
       )
-      //console.log(`addressData: ${util.inspect(addressData)}`)
+      // console.log(`addressData: ${JSON.stringify(addressData, null, 2)}`)
 
       // Update hasBalance array with non-zero balances.
       const hasBalance = this.generateHasBalance(addressData.addressData)

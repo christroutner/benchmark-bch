@@ -103,12 +103,14 @@ class SendAll extends Command {
       if (utxos.length < 50) iterLnth = utxos.length
       else iterLnth = 50
 
+      const utxosUsed = []
+
       // Calulate the original amount in the wallet and add all UTXOs to the
       // transaction builder.
       for (var i = 0; i < iterLnth; i++) {
         const utxo = utxos[i]
 
-        if (i < 5) console.log(`utxo: ${JSON.stringify(utxo, null, 2)}`)
+        utxosUsed.push(utxo)
 
         originalAmount = originalAmount + utxo.satoshis
 
@@ -144,8 +146,8 @@ class SendAll extends Command {
       let redeemScript
 
       // Loop through each input and sign
-      for (var i = 0; i < iterLnth; i++) {
-        const utxo = utxos[i]
+      for (var i = 0; i < utxosUsed.length; i++) {
+        const utxo = utxosUsed[i]
 
         // Generate a keypair for the current address.
         const change = await appUtils.changeAddrFromMnemonic(
@@ -153,6 +155,14 @@ class SendAll extends Command {
           utxo.hdIndex
         )
         const keyPair = this.BITBOX.HDNode.toKeyPair(change)
+
+        // Compare the public addresses and make sure they match.
+        const thisPubKey = this.BITBOX.ECPair.toLegacyAddress(keyPair)
+        if (thisPubKey !== utxo.legacyAddr) {
+          throw new Error(
+            `utxo ${i} address ${utxo.legacyAddr}, does not match EC pair address: ${thisPubKey}`
+          )
+        }
 
         transactionBuilder.sign(
           i,
