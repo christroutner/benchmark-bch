@@ -45,15 +45,16 @@ describe("#util.js", () => {
 
       assert.isArray(utxos, "Expect array of utxos")
       if (utxos.length > 0) {
-        assert.hasAllKeys(utxos[0], [
-          "txid",
-          "vout",
-          "satoshis",
-          "height",
-          "confirmations",
-          "hdIndex",
-          "value"
-        ])
+        assert.property(utxos[0], "txid")
+        assert.property(utxos[0], "vout")
+        assert.property(utxos[0], "satoshis")
+        assert.property(utxos[0], "height")
+        assert.property(utxos[0], "confirmations")
+        assert.property(utxos[0], "hdIndex")
+        assert.property(utxos[0], "value")
+        assert.property(utxos[0], "cashAddr")
+        assert.property(utxos[0], "legacyAddr")
+        assert.property(utxos[0], "slpAddr")
       }
     })
   })
@@ -133,6 +134,37 @@ describe("#util.js", () => {
       // console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
       assert.equal(result, true)
+    })
+  })
+
+  describe("#generateAddresses", () => {
+    it("should generate an address accurately.", async () => {
+      // updateBalances.BITBOX = new config.BCHLIB({
+      //   restURL: config.TESTNET_REST
+      // })
+
+      const addr = await appUtils.generateAddress(utilMocks.mockWallet, 3, 1)
+      //console.log(`addr: ${util.inspect(addr)}`)
+
+      assert.isArray(addr)
+      assert.equal(addr.length, 1)
+      assert.equal(
+        addr[0],
+        "bchtest:qqkng037s5pjhhk38mkaa3c6grl3uep845evtxvyse"
+      )
+    })
+
+    it("should generate the first 20 addresses", async () => {
+      appUtils.BITBOX = new config.BCHLIB({
+        restURL: config.TESTNET_REST
+      })
+
+      const addr = await appUtils.generateAddress(utilMocks.mockWallet, 0, 20)
+      //console.log(`addr: ${util.inspect(addr)}`)
+
+      assert.isArray(addr)
+      assert.equal(addr.length, 20)
+      assert.equal(addr[0], utilMocks.mockWallet.rootAddress)
     })
   })
 })

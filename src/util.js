@@ -233,6 +233,68 @@ class AppUtils {
   sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
   }
+
+  // Returns an integer representing the HD node index of an address. Scans
+  // from 0 to walletInfo.nextAddress.
+  // Returns false if address is not found.
+  getIndex(addr, walletInfo) {
+    try {
+      const retVal = false
+
+      if (!walletInfo.nextAddress)
+        throw new Error(`walletInfo object does not have nextAddress property.`)
+
+      for (let i = 0; i < walletInfo.nextAddress; i++) {}
+    } catch (err) {
+      console.error(`Error in util.js/getIndex()`)
+      throw err
+    }
+  }
+
+  // Generates an array of HD addresses.
+  // Address are generated from index to limit.
+  // e.g. generateAddress(walletInfo, 20, 10)
+  // will generate a 20-element array of addresses from index 20 to 29
+  async generateAddress(walletInfo, index, limit) {
+    // console.log(`walletInfo: ${JSON.stringify(walletInfo, null, 2)}`)
+
+    if (!walletInfo.mnemonic) throw new Error(`mnemonic is undefined!`)
+
+    // root seed buffer
+    let rootSeed
+    if (config.RESTAPI === "bitcoin.com")
+      rootSeed = this.BITBOX.Mnemonic.toSeed(walletInfo.mnemonic)
+    else rootSeed = await this.BITBOX.Mnemonic.toSeed(walletInfo.mnemonic)
+
+    // master HDNode
+    if (walletInfo.network === "testnet")
+      var masterHDNode = this.BITBOX.HDNode.fromSeed(rootSeed, "testnet")
+    else var masterHDNode = this.BITBOX.HDNode.fromSeed(rootSeed)
+
+    // HDNode of BIP44 account
+    const account = this.BITBOX.HDNode.derivePath(
+      masterHDNode,
+      `m/44'/${walletInfo.derivation}'/0'`
+    )
+
+    // Empty array for collecting generated addresses
+    const bulkAddresses = []
+
+    // Generate the addresses.
+    for (let i = index; i < index + limit; i++) {
+      // derive an external change address HDNode
+      const change = this.BITBOX.HDNode.derivePath(account, `0/${i}`)
+
+      // get the cash address
+      const newAddress = this.BITBOX.HDNode.toCashAddress(change)
+      //const legacy = this.BITBOX.HDNode.toLegacyAddress(change)
+
+      //push address into array
+      bulkAddresses.push(newAddress)
+    }
+
+    return bulkAddresses
+  }
 }
 
 module.exports = AppUtils

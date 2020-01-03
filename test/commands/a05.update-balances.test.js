@@ -64,45 +64,6 @@ describe("#update-balances.js", () => {
     })
   })
 
-  describe("#generateAddresses", () => {
-    it("should generate an address accurately.", async () => {
-      // updateBalances.BITBOX = new config.BCHLIB({
-      //   restURL: config.TESTNET_REST
-      // })
-
-      const addr = await updateBalances.generateAddress(
-        updateBalancesMocks.mockWallet,
-        3,
-        1
-      )
-      //console.log(`addr: ${util.inspect(addr)}`)
-
-      assert.isArray(addr)
-      assert.equal(addr.length, 1)
-      assert.equal(
-        addr[0],
-        "bchtest:qqkng037s5pjhhk38mkaa3c6grl3uep845evtxvyse"
-      )
-    })
-
-    it("should generate the first 20 addresses", async () => {
-      updateBalances.BITBOX = new config.BCHLIB({
-        restURL: config.TESTNET_REST
-      })
-
-      const addr = await updateBalances.generateAddress(
-        updateBalancesMocks.mockWallet,
-        0,
-        20
-      )
-      //console.log(`addr: ${util.inspect(addr)}`)
-
-      assert.isArray(addr)
-      assert.equal(addr.length, 20)
-      assert.equal(addr[0], updateBalancesMocks.mockWallet.rootAddress)
-    })
-  })
-
   describe("#findSlpUtxos", () => {
     it(`should return utxos hydrated with token data`, async () => {
       // Mock external calls if this is a unit test.

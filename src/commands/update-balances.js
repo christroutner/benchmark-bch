@@ -32,6 +32,8 @@ class UpdateBalances extends Command {
     super(argv, config)
 
     this.BITBOX = BITBOX
+
+    this.appUtils = appUtils
   }
 
   async run() {
@@ -67,7 +69,7 @@ class UpdateBalances extends Command {
 
       // Open the wallet data file.
       const filename = `${__dirname}/../../wallets/${name}.json`
-      const walletInfo = appUtils.openWallet(filename)
+      const walletInfo = this.appUtils.openWallet(filename)
       walletInfo.name = name
 
       console.log(`Existing balance: ${walletInfo.balance} BCH`)
@@ -97,14 +99,14 @@ class UpdateBalances extends Command {
       this.displayTokenBalances(addressData.slpUtxoData)
 
       // Save the data to the wallet JSON file.
-      walletInfo.balance = appUtils.eightDecimals(
+      walletInfo.balance = this.appUtils.eightDecimals(
         balance.totalConfirmed + balance.totalUnconfirmed
       )
       walletInfo.balanceConfirmed = balance.totalConfirmed
       walletInfo.balanceUnconfirmed = balance.totalUnconfirmed
       walletInfo.hasBalance = hasBalance
       walletInfo.SLPUtxos = addressData.slpUtxoData
-      await appUtils.saveWallet(filename, walletInfo)
+      await this.appUtils.saveWallet(filename, walletInfo)
 
       return walletInfo
     } catch (err) {
@@ -157,7 +159,7 @@ class UpdateBalances extends Command {
 
         // Write out summary info to the console.
         console.log(
-          `${tickers[i]} ${appUtils.eightDecimals(total)} ${thisTokenId}`
+          `${tickers[i]} ${this.appUtils.eightDecimals(total)} ${thisTokenId}`
         )
       }
       console.log(` `)
@@ -292,7 +294,11 @@ class UpdateBalances extends Command {
       )
 
       // Get the list of addresses.
-      const addresses = await this.generateAddress(walletInfo, index, limit)
+      const addresses = await this.appUtils.generateAddress(
+        walletInfo,
+        index,
+        limit
+      )
       // console.log(`addresses: ${util.inspect(addresses)}`)
 
       // get BCH balance and details for each address.
@@ -400,51 +406,6 @@ class UpdateBalances extends Command {
     }
   }
 
-  // Generates an array of HD addresses.
-  // Address are generated from index to limit.
-  // e.g. generateAddress(walletInfo, 20, 10)
-  // will generate a 20-element array of addresses from index 20 to 29
-  async generateAddress(walletInfo, index, limit) {
-    // console.log(`walletInfo: ${JSON.stringify(walletInfo, null, 2)}`)
-
-    if (!walletInfo.mnemonic) throw new Error(`mnemonic is undefined!`)
-
-    // root seed buffer
-    let rootSeed
-    if (config.RESTAPI === "bitcoin.com")
-      rootSeed = this.BITBOX.Mnemonic.toSeed(walletInfo.mnemonic)
-    else rootSeed = await this.BITBOX.Mnemonic.toSeed(walletInfo.mnemonic)
-
-    // master HDNode
-    if (walletInfo.network === "testnet")
-      var masterHDNode = this.BITBOX.HDNode.fromSeed(rootSeed, "testnet")
-    else var masterHDNode = this.BITBOX.HDNode.fromSeed(rootSeed)
-
-    // HDNode of BIP44 account
-    const account = this.BITBOX.HDNode.derivePath(
-      masterHDNode,
-      `m/44'/${walletInfo.derivation}'/0'`
-    )
-
-    // Empty array for collecting generated addresses
-    const bulkAddresses = []
-
-    // Generate the addresses.
-    for (let i = index; i < index + limit; i++) {
-      // derive an external change address HDNode
-      const change = this.BITBOX.HDNode.derivePath(account, `0/${i}`)
-
-      // get the cash address
-      const newAddress = this.BITBOX.HDNode.toCashAddress(change)
-      //const legacy = this.BITBOX.HDNode.toLegacyAddress(change)
-
-      //push address into array
-      bulkAddresses.push(newAddress)
-    }
-
-    return bulkAddresses
-  }
-
   // Generates the data that will be stored in the hasBalance array of the
   // wallet JSON file.
   generateHasBalance(addressData) {
@@ -461,11 +422,11 @@ class UpdateBalances extends Command {
       ) {
         const thisObj = {
           index: i,
-          balance: appUtils.eightDecimals(
+          balance: this.appUtils.eightDecimals(
             Number(thisAddr.balance) / SATS_PER_BCH
           ),
           balanceSat: Number(thisAddr.balance),
-          unconfirmedBalance: appUtils.eightDecimals(
+          unconfirmedBalance: this.appUtils.eightDecimals(
             Number(thisAddr.unconfirmedBalance) / SATS_PER_BCH
           ),
           unconfirmedBalanceSat: Number(thisAddr.unconfirmedBalance),
