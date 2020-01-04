@@ -295,9 +295,10 @@ describe("#update-balances.js", () => {
   describe("#generateHasBalance", () => {
     it("generates a hasBalance array", async () => {
       const hasBalance = await updateBalances.generateHasBalance(
-        updateBalancesMocks.mockAddressDetails1
+        updateBalancesMocks.mockAddressDetails1,
+        updateBalancesMocks.mockWallet
       )
-      //console.log(`hasBalance: ${util.inspect(hasBalance)}`)
+      // console.log(`hasBalance: ${util.inspect(hasBalance)}`)
 
       assert.isArray(hasBalance, "Expect array of addresses with balances.")
       assert.hasAllKeys(hasBalance[0], [

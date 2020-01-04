@@ -182,15 +182,29 @@ describe("#util.js", () => {
       }
     })
 
+    it("should throw an error if walletInfo does not have an addresses property", async () => {
+      try {
+        await appUtils.getIndex("abc", { nextAddress: 2 })
+
+        assert.equal(true, false, "Unexpected result")
+      } catch (err) {
+        assert.include(
+          err.message,
+          "walletInfo object does not have an addresses property"
+        )
+      }
+    })
+
     it("should return false if address is not included in wallet", async () => {
       const result = await appUtils.getIndex("abc", utilMocks.mockWallet)
 
       assert.equal(result, false)
     })
 
-    it("should do something", async () => {
+    it("should get index", async () => {
       const addr = `bchtest:qp6dyeslwkslzruaf29vvtv6lg7lez8csca90lg6a0`
       const result = await appUtils.getIndex(addr, utilMocks.mockWallet)
+      console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
       assert.equal(result, 2)
     })

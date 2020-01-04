@@ -239,29 +239,40 @@ class AppUtils {
   // Returns false if address is not found.
   async getIndex(addr, walletInfo) {
     try {
-      let retVal = false
+      const retVal = false
 
       if (!walletInfo || !walletInfo.nextAddress)
         throw new Error(`walletInfo object does not have nextAddress property.`)
 
-      // Generate an array containing all the addresses used by the wallet so far.
-      const addresses = await this.generateAddress(
-        walletInfo,
-        0,
-        walletInfo.nextAddress
-      )
-      // console.log(`addresses: ${JSON.stringify(addresses, null, 2)}`)
-
-      // Loop through all the addresses to find a match.
-      for (let i = 0; i < addresses.length; i++) {
-        const thisAddr = addresses[i]
-
-        // If a match is found, exit the loop and return the value.
-        if (addr === thisAddr) {
-          retVal = i
-          break
-        }
+      if (!walletInfo.addresses) {
+        throw new Error(
+          `walletInfo object does not have an addresses property.`
+        )
       }
+
+      const addrData = walletInfo.addresses.filter(x => x[1] === addr)
+      console.log(`addrData: ${JSON.stringify(addrData, null, 2)}`)
+
+      if (addrData.length === 1) return addrData[0][0]
+
+      // // Generate an array containing all the addresses used by the wallet so far.
+      // const addresses = await this.generateAddress(
+      //   walletInfo,
+      //   0,
+      //   walletInfo.nextAddress
+      // )
+      // // console.log(`addresses: ${JSON.stringify(addresses, null, 2)}`)
+      //
+      // // Loop through all the addresses to find a match.
+      // for (let i = 0; i < addresses.length; i++) {
+      //   const thisAddr = addresses[i]
+      //
+      //   // If a match is found, exit the loop and return the value.
+      //   if (addr === thisAddr) {
+      //     retVal = i
+      //     break
+      //   }
+      // }
 
       return retVal
     } catch (err) {

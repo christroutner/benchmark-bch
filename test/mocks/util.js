@@ -48,7 +48,13 @@ const mockWallet = {
   name: "temp",
   balanceConfirmed: 0.00001,
   balanceUnconfirmed: 0,
-  SLPUtxos: []
+  SLPUtxos: [],
+  addresses: [
+    [0, "bchtest:qzl37uzel5urphw8dnkerxtlr5mxunvsys062p7g9v"],
+    [1, "bchtest:qzylf04c9f9d20gndgw9dp82602umwzuuqhnxv7jmn"],
+    [2, "bchtest:qp6dyeslwkslzruaf29vvtv6lg7lez8csca90lg6a0"],
+    [3, "bchtest:qqkng037s5pjhhk38mkaa3c6grl3uep845evtxvyse"]
+  ]
 }
 
 const mainnetWallet = {

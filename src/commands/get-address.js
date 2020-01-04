@@ -31,6 +31,7 @@ class GetAddress extends Command {
     super(argv, config)
 
     this.BITBOX = BITBOX
+    this.appUtils = appUtils
   }
 
   async run() {
@@ -68,7 +69,7 @@ class GetAddress extends Command {
   async getAddress(filename, flags) {
     //const filename = `${__dirname}/../../wallets/${name}.json`
 
-    const walletInfo = appUtils.openWallet(filename)
+    const walletInfo = this.appUtils.openWallet(filename)
     //console.log(`walletInfo: ${JSON.stringify(walletInfo, null, 2)}`)
 
     // Point to the correct rest server.
@@ -105,8 +106,18 @@ class GetAddress extends Command {
     // Increment to point to a new address for next time.
     walletInfo.nextAddress++
 
+    // Update the wallet.addresses array.
+    const addresses = await this.appUtils.generateAddress(
+      walletInfo,
+      0,
+      walletInfo.nextAddress
+    )
+    walletInfo.addresses = []
+    for (let i = 0; i < addresses.length; i++)
+      walletInfo.addresses.push([i, addresses[i]])
+
     // Update the wallet file.
-    await appUtils.saveWallet(filename, walletInfo)
+    await this.appUtils.saveWallet(filename, walletInfo)
 
     // get the cash address
     let newAddress = this.BITBOX.HDNode.toCashAddress(change)

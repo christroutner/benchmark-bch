@@ -89,7 +89,10 @@ class UpdateBalances extends Command {
       // console.log(`addressData: ${JSON.stringify(addressData, null, 2)}`)
 
       // Update hasBalance array with non-zero balances.
-      const hasBalance = this.generateHasBalance(addressData.addressData)
+      const hasBalance = await this.generateHasBalance(
+        addressData.addressData,
+        walletInfo
+      )
       // console.log(`hasBalance: ${JSON.stringify(hasBalance, null, 2)}`)
 
       // Sum all the balances in hasBalance to calculate total balance.
@@ -408,7 +411,7 @@ class UpdateBalances extends Command {
 
   // Generates the data that will be stored in the hasBalance array of the
   // wallet JSON file.
-  generateHasBalance(addressData) {
+  async generateHasBalance(addressData, walletInfo) {
     const hasBalance = []
 
     // Loop through each HD address index
@@ -420,8 +423,16 @@ class UpdateBalances extends Command {
         Number(thisAddr.balance) > 0 ||
         Number(thisAddr.unconfirmedBalance) > 0
       ) {
+        // Get the HD Index of the current address.
+        const hdIndex = await this.appUtils.getIndex(
+          thisAddr.address,
+          walletInfo
+        )
+
+        if (!hdIndex) throw new Error(`Address ${thisAddr.address} not found!`)
+
         const thisObj = {
-          index: i,
+          index: hdIndex,
           balance: this.appUtils.eightDecimals(
             Number(thisAddr.balance) / SATS_PER_BCH
           ),
