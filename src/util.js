@@ -251,7 +251,7 @@ class AppUtils {
       }
 
       const addrData = walletInfo.addresses.filter(x => x[1] === addr)
-      console.log(`addrData: ${JSON.stringify(addrData, null, 2)}`)
+      // console.log(`addrData: ${JSON.stringify(addrData, null, 2)}`)
 
       if (addrData.length === 1) return addrData[0][0]
 
