@@ -44,14 +44,14 @@ Because the wallet is so simple and generating the transaction is simple, easy t
 ## The Basic Math
 - 5 minutes = 300 seconds.
 - 1 token send = 12 requests
-- Need to set up 300 public addresses. Make one token send per second to generate sustained 12 rps.
+- Need to set up 300 public addresses. Make one token send per second to generate sustained 12 requests per second (rps) or 1 transaction per second (tps).
 
 ## Deviations From Reality
 The reality is that BCH transactions are messy. Here are a few real-world considerations that complicate this kind of test:
 
 - It’s not uncommon for an hour to pass without a block confirmation. This makes it difficult to stage a test wallet without running into the unconfirmed 25-tx limit.
 
-- High or low network transaction volume will skew results. If the test is run during low network usage, the results will be skewed in favor of performance of the system. If run during high network usage, the results will be skewed against performance.
+- High or low network transaction volume will skew results. If the test is run during low network usage, the results will be skewed in favor of performance of the system. If run during high network usage, the results will be skewed against performance. For this reason, the daily transaction volume, averaged over the last week, should be noted before executing a benchmark test.
 
 - Most transactions rely on UTXO data retrieved from an indexer. It takes time for indexers to update their database, so there is always a period of time after each transaction where UTXOs in the indexer are invalid relative to the blockchain. This is why the test wallet is ‘staged’ with UTXOs, and does not accurately reflect the behavior of ‘power’ users who rapidly use child UTXOs in a short period of time.
 
