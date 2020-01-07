@@ -1,6 +1,6 @@
 # Appendix 1 - Example SLP token transaction
 
-Below is the output of a wallet managed by slp-cli-wallet. It contains an ideal balance of 1 token UTXO and one non-token UTXO. The transaction includes sending a token from the wallet to an address.
+Below is the output of a wallet managed by [slp-cli-wallet](https://github.com/christroutner/bch-cli-wallet). It contains an ideal balance of 1 token UTXO and one non-token UTXO. The transaction includes sending a token from the wallet to an address.
 
 `./bin/run send-tokens -n temp -q 20 -a simpleledger:qqwnssxngyzkz77lh0vvggek48rmm40t6vum2jw7sn -t 497291b8a1dfe69c8daea50677a3d31a5ef0e9484d8bebb610dac64bbc202fb7`
 

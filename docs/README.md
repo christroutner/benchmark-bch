@@ -46,6 +46,17 @@ Because the wallet is so simple and generating the transaction is simple, easy t
 - 1 token send = 12 requests
 - Need to set up 300 public addresses. Make one token send per second to generate sustained 12 rps.
 
+## Deviations From Reality
+The reality is that BCH transactions are messy. Here are a few real-world considerations that complicate this kind of test:
+
+- It’s not uncommon for an hour to pass without a block confirmation. This makes it difficult to stage a test wallet without running into the unconfirmed 25-tx limit.
+
+- High or low network transaction volume will skew results. If the test is run during low network usage, the results will be skewed in favor of performance of the system. If run during high network usage, the results will be skewed against performance.
+
+- Most transactions rely on UTXO data retrieved from an indexer. It takes time for indexers to update their database, so there is always a period of time after each transaction where UTXOs in the indexer are invalid relative to the blockchain. This is why the test wallet is ‘staged’ with UTXOs, and does not accurately reflect the behavior of ‘power’ users who rapidly use child UTXOs in a short period of time.
+
+
+
 ## CLI app commands
 - `create-wallet` - create a series of BCH wallets. The first wallet should be loaded with BCH. A second wallet should be created and loaded with tokens. Finally a third uut (unit under test) wallet should be created, which will be the one used in the actual test.
 
@@ -62,12 +73,3 @@ This command has been created with automatic retry logic. Approximately 4 minute
 
 
 `send-all` - send all BCH to clean up the test wallet and consolidate funds back in the master wallet. Use the -i flag to ignore tokens and spend their dust UTXOs, effectively burning the tokens.
-
-## Deviations From Reality
-The reality is that BCH transactions are messy. Here are a few real-world considerations that complicate this kind of test:
-
-- It’s not uncommon for an hour to pass without a block confirmation. This makes it difficult to stage a test wallet without running into the unconfirmed 25-tx limit.
-
-- High or low network transaction volume will skew results. If the test is run during low network usage, the results will be skewed in favor of performance of the system. If run during high network usage, the results will be skewed against performance.
-
-- Most transactions rely on UTXO data retrieved from an indexer. It takes time for indexers to update their database, so there is always a period of time after each transaction where UTXOs in the indexer are invalid relative to the blockchain. This is why the test wallet is ‘staged’ with UTXOs, and does not accurately reflect the behavior of ‘power’ users who rapidly use child UTXOs in a short period of time.
