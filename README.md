@@ -1,25 +1,10 @@
-slp-cli-wallet
-========
+benchmark-bch
+=============
 
-This is an npm library and Bitcoin Cash (BCH) wallet that runs on the command
-line. Add this library to your app to instantly give it the ability to transact
-on the BCH network! New to Bitcoin Cash? Learn the basics with [Mastering Bitcoin Cash](https://developer.bitcoin.com/mastering-bitcoin-cash/).
+This repository is a fork [slp-cli-wallet](https://github.com/christroutner/bch-cli-wallet). It is a command-line application used to run benchmark tests against different configurations of the 'Cash Stack':
 
-This project is forked from the Bitcoin.com [bch-cli-wallet](https://github.com/Bitcoin-com/bch-cli-wallet), and has been expanded to support SLP tokens. These new features may be rolled into that parent repository and this library deprecated. But for now, they are two separate libraries.
+![The 'Cash Stack' Software Stack](./docs/cash-stack.jpeg)
 
-This project has the following goals:
-- Create a code base for a wallet that is easily forkable and extensible by JavaScript developers.
-- Provide a high-level abstraction to make it easy for new developers to add BCH and SLP wallet functionality into their apps.
-
-If you want a wallet with a graphical user interface, check out
-[Badger Wallet](http://badger.bitcoin.com/). BCH functionality is
-implemented in both wallets with [BITBOX](https://developer.bitcoin.com/bitbox), and the command
-line interface for this project is built with [oclif](https://oclif.io).
-
-Also, be sure to check out the design decisions and trade-offs that went into the
-creation of this project in the [docs directory](./docs)
-
-[![Build Status](https://travis-ci.org/christroutner/bch-cli-wallet.svg?branch=master)](https://travis-ci.org/christroutner/bch-cli-wallet) [![Coverage Status](https://coveralls.io/repos/github/christroutner/bch-cli-wallet/badge.svg?branch=master)](https://coveralls.io/github/christroutner/bch-cli-wallet?branch=master) [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release) [![Greenkeeper badge](https://badges.greenkeeper.io/christroutner/bch-cli-wallet.svg)](https://greenkeeper.io/)
 
 <!-- toc -->
 * [NPM Usage](#npm-usage)
