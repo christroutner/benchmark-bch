@@ -4,6 +4,8 @@
 ## Purpose and Scope
 The purpose of this document is to describe a protocol for benchmarking and testing [the BCH full stack of software](https://troutsblog.com/research/bitcoin-cash/how-to-bch-full-stack-developer), the system-as-a-whole. The scope of the work is to assemble a collection of standardized virtual private servers (VPS) and run a standardized command line application against that collection. The deliverable is test data that can be compared to previous and future results, in order to accurately price cloud services.
 
+![The 'Cash Stack' Software Stack](./cash-stack.jpeg)
+
 ## Test System
 The diagram below illustrates the wiring of the benchmarking system. Using Digital Ocean, the cost of the system is $170 per month. The goal is to be able to serve 12 requests per second with this system, but a range of throughput around that number should be tested.
 
