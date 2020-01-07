@@ -1,7 +1,7 @@
 benchmark-bch
 =============
 
-This repository is a fork [slp-cli-wallet](https://github.com/christroutner/bch-cli-wallet). It is a command-line application used to run benchmark tests against different configurations of the 'Cash Stack'.
+This repository is a fork [slp-cli-wallet](https://github.com/christroutner/bch-cli-wallet). It is a command-line application used to run benchmark tests against different configurations of the 'Cash Stack'. Additional documentation is available in the [docs directory](./docs).
 
 ![The 'Cash Stack' Software Stack](./docs/cash-stack.jpeg)
 
