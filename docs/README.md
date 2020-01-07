@@ -7,7 +7,7 @@ The purpose of this document is to describe a protocol for benchmarking and test
 ![The 'Cash Stack' Software Stack](./cash-stack.jpeg)
 
 ## Test System
-The diagram below illustrates the wiring of the benchmarking system. Using Digital Ocean, the cost of the system is $170 per month. The goal is to be able to serve 12 requests per second with this system, but a range of throughput around that number should be tested.
+The diagram below illustrates the wiring of the benchmarking system. Using Digital Ocean, the cost of the system is $170 per month. The goal is to be able to serve between 10 to 1000 requests per second with this system, and throughput around that range will be tested.
 
 ![Benchmarking System - $170 per month using Digital Ocean](./benchmark-system.jpeg)
 
@@ -89,7 +89,7 @@ The above transaction generated the following API calls when sending a single to
 ::ffff:127.0.0.1 - POST /v3/rawtransactions/sendRawTransaction 200 223.042 ms - 68 axios/0.19.0
 
 
-Conclusion
+### Conclusion
 A single ‘action’ such as sending a token resulted in 12 API calls to the REST API. This is an idealized wallet; real-world wallets may make significantly more API calls.
 
 
