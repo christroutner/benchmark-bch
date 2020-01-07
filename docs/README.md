@@ -6,6 +6,24 @@ The purpose of this document is to describe a protocol for benchmarking and test
 
 ![The 'Cash Stack' Software Stack](./cash-stack.jpeg)
 
+There are many implementation of each layer of the Cash Stack. For example, all the following full nodes implementations can be used for the full node layer:
+
+- [Bitcoin ABC](https://www.bitcoinabc.org/)
+- [Bitcoin Unlimited](https://www.bitcoinunlimited.info/download)
+- [BCHD](https://bchd.cash/)
+- [Flowee the Hub](https://flowee.org/)
+- [Bitcoin Verde](https://github.com/SoftwareVerde/bitcoin-verde)
+
+There are many implementation of indexers. Some are general purpose, and some are specific to a use case (like SLP tokens). A few examples of the indexer layer include:
+
+- [Blockbook](https://troutsblog.com/research/bitcoin-cash/blockbook)
+- [Bitcore Node](https://troutsblog.com/research/bitcoin-cash/bitcore-node-insight-api)
+- [Flowee Indexer](https://flowee.org/)
+- [BCHD](https://bchd.cash/) (includes indexing capabilities)
+- [SLPDB](https://github.com/simpleledger/SLPDB)
+
+The benchmark tests in this repository allow comparison between systems using different implementations.
+
 ## Test System
 The diagram below illustrates the wiring of the benchmarking system. Using Digital Ocean, the cost of the system is $170 per month. The goal is to be able to serve between 10 to 1000 requests per second with this system, and throughput around that range will be tested.
 
