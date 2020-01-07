@@ -1,39 +1,18 @@
 benchmark-bch
 =============
 
-This repository is a fork [slp-cli-wallet](https://github.com/christroutner/bch-cli-wallet). It is a command-line application used to run benchmark tests against different configurations of the 'Cash Stack':
+This repository is a fork [slp-cli-wallet](https://github.com/christroutner/bch-cli-wallet). It is a command-line application used to run benchmark tests against different configurations of the 'Cash Stack'.
 
 ![The 'Cash Stack' Software Stack](./docs/cash-stack.jpeg)
 
 
 <!-- toc -->
-* [NPM Usage](#npm-usage)
 * [Install Dev Environment](#install-dev-environment)
 * [Command Line Usage](#command-line-usage)
 * [Commands](#commands)
 <!-- tocstop -->
 
 
-# NPM Usage
-The [npm library](https://www.npmjs.com/package/slp-cli-wallet) can be included
-in your own app to instantly give it the ability to send and receive BCH transactions, including SLP tokens.
-Here is an example of how to include it in your own app. This example will generate
-a new HD wallet.
-
-```javascript
-// Instantiate the Create Wallet class from this library.
-const CreateWallet = require('slp-cli-wallet/src/commands/create-wallet')
-const createWallet = new CreateWallet()
-
-const walletFile = './wallet.json'
-
-async function makeNewWallet() {
-  const wallet = await createWallet.createWallet(walletFile)
-
-  console.log(`wallet: ${JSON.stringify(wallet,null,2)}`)
-}
-makeNewWallet()
-```
 
 # Install Dev Environment
 While this npm library can be used globally, the intended audience is developers
