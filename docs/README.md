@@ -49,6 +49,8 @@ Because the wallet is so simple and generating the transaction is simple, easy t
 ## Deviations From Reality
 The reality is that BCH transactions are messy. Here are a few real-world considerations that complicate this kind of test:
 
+- While these benchmarks can be run on either testnet or mainnet, mainnet is encouraged. Testnet is a strange place and often does not reflect the real-world network perforance of mainnet. Development is encouraged for testnet, but real-world testing data should be generated from mainnet.
+
 - It’s not uncommon for an hour to pass without a block confirmation. This makes it difficult to stage a test wallet without running into the unconfirmed 25-tx limit.
 
 - High or low network transaction volume will skew results. If the test is run during low network usage, the results will be skewed in favor of performance of the system. If run during high network usage, the results will be skewed against performance. For this reason, the daily transaction volume, averaged over the last week, should be noted before executing a benchmark test.
@@ -72,6 +74,7 @@ While all benchmark tests in this repository test the system-as-a-whole, there a
   - The wallet repeatedly tries to spend the same UTXO until it succeeds.
   - The time between each successful TX is measured and averaged across the 200 TXs.
 
+- `staged-token-test` is similar to the *node-test* but includes the sending of an SLP token. This test forces SLPDB to rapidly update its database for a specific token. It's a test of the indexers ability to process sustained and rapid SLP transactions over a period of time.
 
 
 ## CLI app commands
