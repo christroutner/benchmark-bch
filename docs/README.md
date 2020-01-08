@@ -49,7 +49,7 @@ Because the wallet is so simple and generating the transaction is simple, easy t
 ## Deviations From Reality
 The reality is that BCH transactions are messy. Here are a few real-world considerations that complicate this kind of test:
 
-- While these benchmarks can be run on either testnet or mainnet, mainnet is encouraged. Testnet is a strange place and often does not reflect the real-world network perforance of mainnet. Development is encouraged for testnet, but real-world testing data should be generated from mainnet.
+- While these benchmarks can be run on either testnet or mainnet, mainnet is encouraged. Testnet is a strange place and rarely reflects the real-world network performance of mainnet. Development is encouraged for testnet, but real-world testing data should be generated from mainnet.
 
 - It’s not uncommon for an hour to pass without a block confirmation. This makes it difficult to stage a test wallet without running into the unconfirmed 25-tx limit.
 
