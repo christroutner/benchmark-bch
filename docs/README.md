@@ -74,8 +74,9 @@ While all benchmark tests in this repository test the system-as-a-whole, there a
   - The wallet repeatedly tries to spend the same UTXO until it succeeds.
   - The time between each successful TX is measured and averaged across the 200 TXs.
 
-- `staged-token-test` is similar to the *node-test* but includes the sending of an SLP token. This test forces SLPDB to rapidly update its database for a specific token. It's a test of the indexers ability to process sustained and rapid SLP transactions over a period of time.
+- `staged-token-test` is similar to the *node-test* but includes the sending of an SLP token. This test forces an SLP indexer to rapidly update its database for a specific token. It's a test of the indexers ability to process sustained and rapid SLP transactions over a period of time.
 
+- `unstaged-token-test` is similar to the *indexer-test* but includes the sending of an SLP token. It tests the average time for an SLP indexer to analyze incoming transactions and update its database.
 
 ## CLI app commands
 - `create-wallet` - create a series of BCH wallets. The first wallet should be loaded with BCH. A second wallet should be created and loaded with tokens. Finally a third uut (unit under test) wallet should be created, which will be the one used in the actual test.
