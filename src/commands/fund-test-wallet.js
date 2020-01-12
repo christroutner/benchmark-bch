@@ -107,7 +107,9 @@ class FundTest extends Command {
 
       await this.fundAddresses(sourceWalletInfo, addresses)
 
-      // Add each transaction to the queue.
+      // Update the wallet file with the nextAddress.
+      destWalletInfo.nextAddress = NUMBER_OF_ADDRESSES
+      await this.appUtils.saveWallet(destFilename, destWalletInfo)
     } catch (err) {
       console.log(`Error in fundTestWallet()`)
       throw err

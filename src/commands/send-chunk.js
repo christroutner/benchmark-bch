@@ -100,8 +100,8 @@ class SendAll extends Command {
       console.log(`utxos.length: ${utxos.length}`)
 
       let iterLnth = 0
-      if (utxos.length < 50) iterLnth = utxos.length
-      else iterLnth = 50
+      if (utxos.length < 150) iterLnth = utxos.length
+      else iterLnth = 150
 
       const utxosUsed = []
 
