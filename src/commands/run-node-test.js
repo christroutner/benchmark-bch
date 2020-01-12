@@ -30,9 +30,7 @@ const BITBOX = new config.BCHLIB({
 })
 
 // The number of addresses to fund for the test.
-const NUMBER_OF_ADDRESSES = 300
-
-const TOKEN_ID = `e0f65c4336cdf90589600e34bcf99c77e9a6e0c7d2d3e266c8f4ab9a5383938e`
+const NUMBER_OF_ADDRESSES = 10
 
 const TIME_BETWEEN_TXS = 1000 // time in milliseconds
 
@@ -113,7 +111,8 @@ class FundTest extends Command {
           const address = addresses[i]
 
           const txid = await this.generateTx(sourceWalletInfo, address, i)
-          console.log(`Tokens sent with TXID: ${txid}`)
+          // console.log(`Tokens sent with TXID: ${txid}`)
+          this.appUtils.displayTxid(txid, sourceWalletInfo.network)
 
           await _this.sleep(TIME_BETWEEN_TXS) // Sleep between txs.
           console.log(" ")
@@ -149,19 +148,18 @@ class FundTest extends Command {
       console.log(`BCH balance for address ${addr}: ${balance.balance}`)
 
       // Get the SLP balance for the address.
-      const tokenBalance = await _this.BITBOX.SLP.Utils.balancesForAddress(addr)
+      // const tokenBalance = await _this.BITBOX.SLP.Utils.balancesForAddress(addr)
       // console.log(`token balance: ${JSON.stringify(tokenBalance, null, 2)}`)
-      console.log(`token balance: ${tokenBalance[0].balance}`)
+      // console.log(`token balance: ${tokenBalance[0].balance}`)
 
       // Get utxos
       const utxos = await _this.BITBOX.Blockbook.utxo(addr)
       // console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
 
       // Get a list of token UTXOs from the wallet for this token.
-      // const tokenUtxos = _this.sendTokens.getTokenUtxos(TOKEN_ID, walletInfo)
-      let tokenUtxos = await _this.BITBOX.SLP.Utils.tokenUtxoDetails(utxos)
-      tokenUtxos = tokenUtxos.filter(x => x)
-      tokenUtxos[0].hdIndex = walletIndex // Expected by sendTokens()
+      // let tokenUtxos = await _this.BITBOX.SLP.Utils.tokenUtxoDetails(utxos)
+      // tokenUtxos = tokenUtxos.filter(x => x)
+      // tokenUtxos[0].hdIndex = walletIndex // Expected by sendTokens()
       // console.log(`tokenUtxos: ${JSON.stringify(tokenUtxos, null, 2)}`)
 
       // Select optimal BCH UTXO
@@ -181,24 +179,22 @@ class FundTest extends Command {
 
       // Pad the test with extra calls to make it more closely resemble the
       // 'ideal' transaction from the test document.
-      await _this.BITBOX.Blockbook.balance(addr)
-      await _this.BITBOX.SLP.Utils.balancesForAddress(addr)
-      await _this.BITBOX.Blockbook.utxo(addr)
-      await _this.BITBOX.Blockbook.utxo(addr)
+      // await _this.BITBOX.Blockbook.balance(addr)
+      // await _this.BITBOX.SLP.Utils.balancesForAddress(addr)
+      // await _this.BITBOX.Blockbook.utxo(addr)
+      // await _this.BITBOX.Blockbook.utxo(addr)
 
       // For now, change is sent to the root address of the source wallet.
       const changeAddr = walletInfo.rootAddress
 
-      // Send the token, transfer change to the new address
-      const hex = await _this.sendTokens.sendTokens(
+      // Send the BCH
+      const hex = await _this.send.sendBCH(
         utxo,
-        1,
+        0.00001,
         changeAddr,
         addr,
-        walletInfo,
-        tokenUtxos
+        walletInfo
       )
-      // console.log(`hex: ${hex}`)
 
       const txid = await _this.appUtils.broadcastTx(hex)
 

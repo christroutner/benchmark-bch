@@ -149,7 +149,8 @@ class FundTest extends Command {
         })
 
         console.log(`Successfully funded address ${address}`)
-        console.log(`TXID: ${txid}`)
+        this.appUtils.displayTxid(txid, walletInfo.network)
+        // console.log(`TXID: ${txid}`)
         console.log(" ")
         console.log(" ")
 

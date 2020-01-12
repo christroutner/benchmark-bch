@@ -52,6 +52,7 @@ USAGE
 * [`slp-cli-wallet help [COMMAND]`](#slp-cli-wallet-help-command)
 * [`slp-cli-wallet list-wallets`](#slp-cli-wallet-list-wallets)
 * [`slp-cli-wallet remove-wallet`](#slp-cli-wallet-remove-wallet)
+* [`slp-cli-wallet run-node-test`](#slp-cli-wallet-run-node-test)
 * [`slp-cli-wallet run-test`](#slp-cli-wallet-run-test)
 * [`slp-cli-wallet send`](#slp-cli-wallet-send)
 * [`slp-cli-wallet send-all`](#slp-cli-wallet-send-all)
@@ -227,6 +228,31 @@ OPTIONS
 ```
 
 _See code: [src/commands/remove-wallet.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/remove-wallet.js)_
+
+## `slp-cli-wallet run-node-test`
+
+Runs the benchmark test
+
+```
+USAGE
+  $ slp-cli-wallet run-node-test
+
+OPTIONS
+  -n, --name=name  source wallet name to source funds
+
+DESCRIPTION
+  ...
+  This command assumes that the wallet has been prepped to run the test by first
+  running these commands:
+  - fund-test-wallet
+  - tokenize-test-wallet
+  - update-balances
+
+  After running the above commands in that order, the wallet will then be prepared
+  to run this command, which executes the benchmark test.
+```
+
+_See code: [src/commands/run-node-test.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/run-node-test.js)_
 
 ## `slp-cli-wallet run-test`
 
