@@ -4,7 +4,7 @@
 ## Purpose and Scope
 The purpose of this document is to describe a protocol for benchmarking and testing [the BCH full stack of software](https://troutsblog.com/research/bitcoin-cash/how-to-bch-full-stack-developer), the system-as-a-whole. The scope of the work is to assemble a collection of standardized virtual private servers (VPS) and run a standardized command line application against that collection. The deliverable is test data that can be compared to previous and future results, in order to accurately price cloud services.
 
-![The 'Cash Stack' Software Stack](./cash-stack.jpeg)
+![The 'Cash Stack' Software Stack](./images/cash-stack.jpeg)
 
 There are many implementation of each layer of the Cash Stack. For example, all the following full nodes implementations can be used for the full node layer:
 
@@ -27,7 +27,7 @@ The benchmark tests in this repository allow comparison between systems using di
 ## Test System
 The diagram below illustrates the wiring of the benchmarking system. Using Digital Ocean, the cost of the system is $170 per month. The goal is to be able to serve between 10 to 1000 requests per second with this system, and throughput around that range will be tested.
 
-![Benchmarking System - $170 per month using Digital Ocean](./benchmark-system.jpeg)
+![Benchmarking System - $170 per month using Digital Ocean](./images/benchmark-system.jpeg)
 
 Benchmarking System - $170 per month using Digital Ocean
 
@@ -60,7 +60,7 @@ The reality is that BCH transactions are messy. Here are a few real-world consid
 ## Variations of Tests
 While all benchmark tests in this repository test the system-as-a-whole, there are variations of the basic test that focus on specific sub-components:
 
-- `node-test` is a variation of the test protocol that focuses on the full nodes ability to receive and broadcast transactions to the network. This does not stress the indexer layer because only confirmed UTXOs are used. This variation is defined by the following qualities:
+- [`node-test`](./test01-node.md) is a variation of the test protocol that focuses on the full nodes ability to receive and broadcast transactions to the network. This does not stress the indexer layer because only confirmed UTXOs are used. This variation is defined by the following qualities:
   - SLPDB is ignored and tokens are not used.
   - A wallet is staged with utxos that have all been confirmed in blocks prior to running the test.
   - No child-utxos are spent. Only staged utxos.
