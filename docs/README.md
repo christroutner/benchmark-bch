@@ -53,9 +53,9 @@ The reality is that BCH transactions are messy. Here are a few real-world consid
 
 - It’s not uncommon for an hour to pass without a block confirmation. This makes it difficult to stage a test wallet without running into the unconfirmed 25-tx limit.
 
-- High or low network transaction volume will skew results. If the test is run during low network usage, the results will be skewed in favor of performance of the system. If run during high network usage, the results will be skewed against performance. For this reason, the daily transaction volume, averaged over the last week, should be noted before executing a benchmark test.
+- High or low network transaction volume will skew results. If the test is run during low network usage, the results will be skewed in favor of performance of the system. If run during high network usage, the results will be skewed against performance. For this reason, the daily transaction volume, averaged over the last 7 days, should be noted before executing a benchmark test.
 
-- Most transactions rely on UTXO data retrieved from an indexer. It takes time for indexers to update their database, so there is always a period of time after each transaction where UTXOs in the indexer are invalid relative to the blockchain. This is why the test wallet is ‘staged’ with UTXOs, and does not accurately reflect the behavior of ‘power’ users who rapidly use child UTXOs in a short period of time.
+- Most transactions rely on UTXO data retrieved from an indexer. It takes time for indexers to update their database, so there is always a period of time after each transaction where UTXOs in the indexer are invalid relative to the blockchain. This is why the test wallet for some tests are ‘staged’ with UTXOs, and does not accurately reflect the behavior of ‘power’ users who rapidly use child UTXOs in a short period of time.
 
 ## Variations of Tests
 While all benchmark tests in this repository test the system-as-a-whole, there are variations of the basic test that focus on specific sub-components:
