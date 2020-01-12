@@ -255,28 +255,48 @@ class AppUtils {
 
       if (addrData.length === 1) return addrData[0][0]
 
-      // // Generate an array containing all the addresses used by the wallet so far.
-      // const addresses = await this.generateAddress(
-      //   walletInfo,
-      //   0,
-      //   walletInfo.nextAddress
-      // )
-      // // console.log(`addresses: ${JSON.stringify(addresses, null, 2)}`)
-      //
-      // // Loop through all the addresses to find a match.
-      // for (let i = 0; i < addresses.length; i++) {
-      //   const thisAddr = addresses[i]
-      //
-      //   // If a match is found, exit the loop and return the value.
-      //   if (addr === thisAddr) {
-      //     retVal = i
-      //     break
-      //   }
-      // }
-
       return retVal
     } catch (err) {
       console.error(`Error in util.js/getIndex()`)
+      throw err
+    }
+  }
+
+  // Similar to getIndex, except it generates the index through computation rather
+  // than simply retrieving it from the wallet file.
+  // Returns an integer representing the HD node index of an address. Scans
+  // from 0 to walletInfo.nextAddress.
+  // Returns false if address is not found.
+  async generateIndex(addr, walletInfo) {
+    try {
+      let retVal = false
+
+      if (!walletInfo || !walletInfo.nextAddress)
+        throw new Error(`walletInfo object does not have nextAddress property.`)
+
+      // Generate an array containing all the addresses used by the wallet so far.
+      const addresses = await this.generateAddress(
+        walletInfo,
+        0,
+        walletInfo.nextAddress
+      )
+      // console.log(`addresses: ${JSON.stringify(addresses, null, 2)}`)
+
+      // Loop through all the addresses to find a match.
+      for (let i = 0; i < addresses.length; i++) {
+        const thisAddr = addresses[i]
+
+        // console.log(`addr: ${addr}, thisAddr: ${thisAddr}`)
+
+        // If a match is found, exit the loop and return the value.
+        if (addr === thisAddr) {
+          retVal = i
+          break
+        }
+      }
+
+      return retVal
+    } catch (err) {
       throw err
     }
   }

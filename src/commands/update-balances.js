@@ -424,12 +424,18 @@ class UpdateBalances extends Command {
         Number(thisAddr.unconfirmedBalance) > 0
       ) {
         // Get the HD Index of the current address.
-        const hdIndex = await this.appUtils.getIndex(
-          thisAddr.address,
-          walletInfo
-        )
+        let hdIndex = await this.appUtils.getIndex(thisAddr.address, walletInfo)
 
-        if (!hdIndex) throw new Error(`Address ${thisAddr.address} not found!`)
+        // If the HD index is not found, then attempt to generate it.
+        if (hdIndex === false) {
+          hdIndex = await this.appUtils.generateIndex(
+            thisAddr.address,
+            walletInfo
+          )
+        }
+
+        if (hdIndex === false)
+          throw new Error(`Address ${thisAddr.address} not found!`)
 
         const thisObj = {
           index: hdIndex,

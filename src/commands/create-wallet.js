@@ -102,6 +102,7 @@ class CreateWallet extends Command {
       walletData.balance = 0
       walletData.nextAddress = 1
       walletData.hasBalance = []
+      walletData.addresses = []
 
       // Write out the basic information into a json file for other apps to use.
       //const filename = `${__dirname}/../../wallets/${name}.json`
