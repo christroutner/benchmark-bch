@@ -25,11 +25,11 @@ There are many implementation of indexers. Some are general purpose, and some ar
 The benchmark tests in this repository allow comparison between systems using different implementations.
 
 ## Test System
-The diagram below illustrates the wiring of the benchmarking system. Using Digital Ocean, the cost of the system is $170 per month. The goal is to be able to serve between 10 to 1000 requests per second with this system, and throughput around that range will be tested.
+The diagram below illustrates the wiring of the benchmarking system. Using Digital Ocean, the cost of the system is $210 per month. The goal is to be able to serve between 10 to 1000 requests per second with this system, and throughput around that range will be tested.
 
 ![Benchmarking System - $170 per month using Digital Ocean](./images/benchmark-system.jpeg)
 
-Benchmarking System - $170 per month using Digital Ocean
+Benchmarking System - $210 per month using Digital Ocean
 
 An advantage of breaking up the test system into discrete ‘blocks’ is that it allows isolated study of each of the system’s subcomponents. It allows identification and characterization of bottlenecks as they form at different levels of throughput.
 

@@ -2,7 +2,7 @@
   Reference:
   https://docs.google.com/document/d/1qtleJjNQ7b8v--RBEN17p56HqtHf9j4Bvtap4YRLXBs/edit#heading=h.vjv6nnxj3xmw
 
-  This command funds a test wallet and prepars it for running a benchmark test.
+  This command runs the test defined in the document above.
 */
 
 "use strict"
@@ -14,6 +14,9 @@ const appUtils = new AppUtils()
 
 const Send = require("./send")
 const send = new Send()
+
+const SendTokens = require("./send-tokens")
+const sendTokens = new SendTokens()
 
 // const GetAddress = require("./get-address")
 // const getAddress = new GetAddress()
@@ -27,18 +30,21 @@ const BITBOX = new config.BCHLIB({
 })
 
 // The number of addresses to fund for the test.
-const NUMBER_OF_ADDRESSES = 10
+const NUMBER_OF_ADDRESSES = 300
 
-// Amount of BCH to send to each address.
-const BCH_TO_SEND = 0.00002
+const TOKEN_ID = `e0f65c4336cdf90589600e34bcf99c77e9a6e0c7d2d3e266c8f4ab9a5383938e`
 
-const TIME_BETWEEN_TXS = 60000 * 0.5
+const TIME_BETWEEN_TXS = 1000 // time in milliseconds
 
 const pRetry = require("p-retry")
 
 const { Command, flags } = require("@oclif/command")
 
 let _this
+
+// Counters for tracking metrics during the test.
+let errorCnt = 0
+let txCnt = 0
 
 class FundTest extends Command {
   constructor(argv, config) {
@@ -54,7 +60,7 @@ class FundTest extends Command {
     this.send = send
     this.send.appUtils = this.appUtils
 
-    this.queueState = {}
+    this.sendTokens = sendTokens
 
     _this = this
   }
@@ -69,27 +75,21 @@ class FundTest extends Command {
       this.flags = flags
 
       // Fund the wallet
-      await this.fundTestWallet(flags)
+      await this.runTest(flags)
     } catch (err) {
       console.log(`Error in fund-test-wallet: `, err)
     }
   }
 
-  // Parent function that starts funding.
-  async fundTestWallet(flags) {
+  // Run the test.
+  async runTest(flags) {
     try {
       const source = flags.name // Name of the source wallet.
-      const dest = flags.dest // Name of the destination wallet.
 
       // Open the source wallet data file.
       const sourceFilename = `${__dirname}/../../wallets/${source}.json`
       const sourceWalletInfo = this.appUtils.openWallet(sourceFilename)
       sourceWalletInfo.name = source
-
-      // Open the destination wallet data file.
-      const destFilename = `${__dirname}/../../wallets/${dest}.json`
-      const destWalletInfo = this.appUtils.openWallet(destFilename)
-      destWalletInfo.name = dest
 
       // Determine if this is a testnet wallet or a mainnet wallet.
       if (sourceWalletInfo.network === "testnet") {
@@ -98,66 +98,39 @@ class FundTest extends Command {
         this.send.BITBOX = this.BITBOX
       }
 
-      // Generate 300 addresses from the test wallet.
+      // Generate addresses from the test wallet.
       const addresses = await this.generateAddresses(
-        destWalletInfo,
+        sourceWalletInfo,
         NUMBER_OF_ADDRESSES
       )
       console.log(`addresses: ${JSON.stringify(addresses, null, 2)}`)
 
-      await this.fundAddresses(sourceWalletInfo, addresses)
-
-      // Add each transaction to the queue.
-    } catch (err) {
-      console.log(`Error in fundTestWallet()`)
-      throw err
-    }
-  }
-
-  // Generates a series of transactions to fund an array of addresses.
-  // Funds one addresss at a time, and will auto-retry in the event of failure.
-  async fundAddresses(walletInfo, addresses) {
-    try {
       // Loop through each address and generate a transaction for each one.
       // Add each transaction to a queue with automatic retry.
       for (let i = 0; i < addresses.length; i++) {
-        const address = addresses[i]
-        console.log(`funding index ${i}, address ${address}`)
+        // for (let i = 0; i < 4; i++) {
+        try {
+          const address = addresses[i]
 
-        // Load the state. p-retry functions can't pass arguments, so they
-        // are passed this way.
-        _this.queueState = {
-          walletInfo,
-          bch: BCH_TO_SEND,
-          addr: address
+          const txid = await this.generateTx(sourceWalletInfo, address, i)
+          console.log(`Tokens sent with TXID: ${txid}`)
+
+          await _this.sleep(TIME_BETWEEN_TXS) // Sleep between txs.
+          console.log(" ")
+
+          txCnt++
+        } catch (err) {
+          console.log(`Error on iteration ${i}`)
+          errorCnt++
+          continue
         }
-
-        const txid = await pRetry(_this.generateTx, {
-          onFailedAttempt: async error => {
-            //   failed attempt.
-            console.log(" ")
-            console.log(
-              `Attempt ${error.attemptNumber} failed. There are ${
-                error.retriesLeft
-              } retries left. Waiting ${TIME_BETWEEN_TXS /
-                60000} minutes before trying again.`
-            )
-            console.log(" ")
-            await _this.sleep(TIME_BETWEEN_TXS) // Sleep for 2 minutes
-          },
-          retries: 20 // Retry 5 times
-        })
-
-        console.log(`Successfully funded address ${address}`)
-        console.log(`TXID: ${txid}`)
-        console.log(" ")
-        console.log(" ")
-
-        await _this.sleep(TIME_BETWEEN_TXS) // Wait some period of time before sending next tx.
       }
+
+      console.log(`test complete. txCnt: ${txCnt}, errorCnt: ${errorCnt}`)
     } catch (err) {
-      console.log(`Error in fund-test-wallet.js/fundAddresses()`)
-      throw err
+      // console.log(`Error in fundTestWallet()`)
+      // throw err
+      errorCnt++
     }
   }
 
@@ -167,44 +140,73 @@ class FundTest extends Command {
   }
 
   // Returns a promise that resolves to a txid string
-  // The intention is for the promise to be added to a retry-queue that will
-  // auto-retry if there is an error.
-  async generateTx() {
+  // This function runs a series of commands that correspond to the transaction
+  // model in the appendix 2 of the test document.
+  async generateTx(walletInfo, addr, walletIndex) {
     try {
-      // Retrieve the state. p-rety functions can't pass arguments.
-      let { walletInfo, bch, addr } = _this.queueState
+      // Get the address balance
+      const balance = await _this.BITBOX.Blockbook.balance(addr)
+      console.log(`BCH balance for address ${addr}: ${balance.balance}`)
 
-      // Update the wallet
-      walletInfo = await _this.updateBalances.updateBalances(_this.flags)
+      // Get the SLP balance for the address.
+      const tokenBalance = await _this.BITBOX.SLP.Utils.balancesForAddress(addr)
+      // console.log(`token balance: ${JSON.stringify(tokenBalance, null, 2)}`)
+      console.log(`token balance: ${tokenBalance[0].balance}`)
 
-      // Get info on UTXOs controlled by this wallet.
-      const utxos = await _this.appUtils.getUTXOs(walletInfo)
-      // console.log(`send utxos: ${JSON.stringify(utxos, null, 2)}`)
+      // Get utxos
+      const utxos = await _this.BITBOX.Blockbook.utxo(addr)
+      // console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
 
-      // Select optimal UTXO
-      const utxo = await _this.send.selectUTXO(bch, utxos)
+      // Get a list of token UTXOs from the wallet for this token.
+      // const tokenUtxos = _this.sendTokens.getTokenUtxos(TOKEN_ID, walletInfo)
+      let tokenUtxos = await _this.BITBOX.SLP.Utils.tokenUtxoDetails(utxos)
+      tokenUtxos = tokenUtxos.filter(x => x)
+      tokenUtxos[0].hdIndex = walletIndex // Expected by sendTokens()
+      // console.log(`tokenUtxos: ${JSON.stringify(tokenUtxos, null, 2)}`)
+
+      // Select optimal BCH UTXO
+      const utxo = await _this.send.selectUTXO(0.00001, utxos)
+      utxo.hdIndex = walletIndex // Expected by sendTokens()
       // console.log(`selected utxo: ${JSON.stringify(utxo, null, 2)}`)
 
       if (!utxo.txid) throw new Error(`No valid UTXO could be found`)
 
+      // Exit if there is no UTXO big enough to fulfill the transaction.
+      if (!utxo.amount) {
+        this.log(
+          `Could not find a UTXO big enough for this transaction. More BCH needed.`
+        )
+        return
+      }
+
+      // Pad the test with extra calls to make it more closely resemble the
+      // 'ideal' transaction from the test document.
+      await _this.BITBOX.Blockbook.balance(addr)
+      await _this.BITBOX.SLP.Utils.balancesForAddress(addr)
+      await _this.BITBOX.Blockbook.utxo(addr)
+      await _this.BITBOX.Blockbook.utxo(addr)
+
       // For now, change is sent to the root address of the source wallet.
       const changeAddr = walletInfo.rootAddress
 
-      const hex = await _this.send.sendBCH(
+      // Send the token, transfer change to the new address
+      const hex = await _this.sendTokens.sendTokens(
         utxo,
-        bch,
+        1,
         changeAddr,
         addr,
-        walletInfo
+        walletInfo,
+        tokenUtxos
       )
+      // console.log(`hex: ${hex}`)
 
       const txid = await _this.appUtils.broadcastTx(hex)
 
       return txid
     } catch (err) {
-      console.log(`Error in fund-test-wallet.js/generateTx: `, err)
-      throw new Error(`Error caught in generateTx()`)
-      // throw err
+      console.log(`Error in run-test.js/generateTx for address ${addr}: `, err)
+      // throw new Error(`Error caught in generateTx()`)
+      throw err
     }
   }
 
@@ -261,29 +263,26 @@ class FundTest extends Command {
     if (!name || name === "")
       throw new Error(`You must specify a source wallet with the -n flag.`)
 
-    const dest = flags.dest
-    if (!dest || dest === "")
-      throw new Error(`You must specify a destination wallet with the -d flag.`)
-
     return true
   }
 }
 
-FundTest.description = `Prepares wallet to run benchmark test
+FundTest.description = `Runs the benchmark test
 ...
-This is a long-running command that funds a new wallet and prepares it to run
-a benchmark test of the BCH infrastructure.
+This command assumes that the wallet has been prepped to run the test by first
+running these commands:
+- fund-test-wallet
+- tokenize-test-wallet
+- update-balances
+
+After running the above commands in that order, the wallet will then be prepared
+to run this command, which executes the benchmark test.
 `
 
 FundTest.flags = {
   name: flags.string({
     char: "n",
     description: "source wallet name to source funds"
-  }),
-
-  dest: flags.string({
-    char: "d",
-    description: "destination wallet name, to send funds to"
   })
 }
 
