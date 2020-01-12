@@ -1,6 +1,6 @@
 /*
   Reference:
-  https://docs.google.com/document/d/1qtleJjNQ7b8v--RBEN17p56HqtHf9j4Bvtap4YRLXBs/edit#heading=h.vjv6nnxj3xmw
+  https://github.com/christroutner/benchmark-bch/blob/master/docs/test01-node.md
 
   This command runs the test defined in the document above.
 */
@@ -18,9 +18,6 @@ const send = new Send()
 const SendTokens = require("./send-tokens")
 const sendTokens = new SendTokens()
 
-// const GetAddress = require("./get-address")
-// const getAddress = new GetAddress()
-
 const UpdateBalances = require("./update-balances")
 
 // Mainnet by default
@@ -34,8 +31,6 @@ const NUMBER_OF_ADDRESSES = 10
 
 const TIME_BETWEEN_TXS = 1000 // time in milliseconds
 
-const pRetry = require("p-retry")
-
 const { Command, flags } = require("@oclif/command")
 
 let _this
@@ -44,7 +39,7 @@ let _this
 let errorCnt = 0
 let txCnt = 0
 
-class FundTest extends Command {
+class NodeTest extends Command {
   constructor(argv, config) {
     super(argv, config)
     //_this = this
@@ -65,7 +60,7 @@ class FundTest extends Command {
 
   async run() {
     try {
-      const { flags } = this.parse(FundTest)
+      const { flags } = this.parse(NodeTest)
 
       // Ensure flags meet qualifiying critieria.
       this.validateFlags(flags)
@@ -111,10 +106,12 @@ class FundTest extends Command {
           const address = addresses[i]
 
           const txid = await this.generateTx(sourceWalletInfo, address, i)
-          // console.log(`Tokens sent with TXID: ${txid}`)
+
+          // Display the txid with a link to the block explorer.
           this.appUtils.displayTxid(txid, sourceWalletInfo.network)
 
-          await _this.sleep(TIME_BETWEEN_TXS) // Sleep between txs.
+          // Sleep between txs.
+          await _this.sleep(TIME_BETWEEN_TXS)
           console.log(" ")
 
           txCnt++
@@ -127,7 +124,7 @@ class FundTest extends Command {
 
       console.log(`test complete. txCnt: ${txCnt}, errorCnt: ${errorCnt}`)
     } catch (err) {
-      // console.log(`Error in fundTestWallet()`)
+      // console.log(`Error in NodeTestWallet()`)
       // throw err
       errorCnt++
     }
@@ -139,28 +136,17 @@ class FundTest extends Command {
   }
 
   // Returns a promise that resolves to a txid string
-  // This function runs a series of commands that correspond to the transaction
-  // model in the appendix 2 of the test document.
   async generateTx(walletInfo, addr, walletIndex) {
     try {
       // Get the address balance
       const balance = await _this.BITBOX.Blockbook.balance(addr)
-      console.log(`BCH balance for address ${addr}: ${balance.balance}`)
-
-      // Get the SLP balance for the address.
-      // const tokenBalance = await _this.BITBOX.SLP.Utils.balancesForAddress(addr)
-      // console.log(`token balance: ${JSON.stringify(tokenBalance, null, 2)}`)
-      // console.log(`token balance: ${tokenBalance[0].balance}`)
+      console.log(
+        `BCH balance for address ${addr}: ${balance.balance} satoshis`
+      )
 
       // Get utxos
       const utxos = await _this.BITBOX.Blockbook.utxo(addr)
       // console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
-
-      // Get a list of token UTXOs from the wallet for this token.
-      // let tokenUtxos = await _this.BITBOX.SLP.Utils.tokenUtxoDetails(utxos)
-      // tokenUtxos = tokenUtxos.filter(x => x)
-      // tokenUtxos[0].hdIndex = walletIndex // Expected by sendTokens()
-      // console.log(`tokenUtxos: ${JSON.stringify(tokenUtxos, null, 2)}`)
 
       // Select optimal BCH UTXO
       const utxo = await _this.send.selectUTXO(0.00001, utxos)
@@ -263,23 +249,22 @@ class FundTest extends Command {
   }
 }
 
-FundTest.description = `Runs the benchmark test
+NodeTest.description = `Runs the full-node benchmark test
 ...
 This command assumes that the wallet has been prepped to run the test by first
 running these commands:
 - fund-test-wallet
-- tokenize-test-wallet
 - update-balances
 
 After running the above commands in that order, the wallet will then be prepared
 to run this command, which executes the benchmark test.
 `
 
-FundTest.flags = {
+NodeTest.flags = {
   name: flags.string({
     char: "n",
     description: "source wallet name to source funds"
   })
 }
 
-module.exports = FundTest
+module.exports = NodeTest
