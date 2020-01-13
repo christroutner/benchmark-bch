@@ -423,6 +423,9 @@ class UpdateBalances extends Command {
         Number(thisAddr.balance) > 0 ||
         Number(thisAddr.unconfirmedBalance) > 0
       ) {
+        // Enable backward-compatible wallets by adding an addresses property.
+        if (walletInfo.addresses === undefined) walletInfo.addresses = []
+
         // Get the HD Index of the current address.
         let hdIndex = await this.appUtils.getIndex(thisAddr.address, walletInfo)
 
