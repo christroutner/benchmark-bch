@@ -32,7 +32,7 @@ const NUMBER_OF_ADDRESSES = 3000
 // Amount of BCH to send to each address.
 const BCH_TO_SEND = 0.00002
 
-const TIME_BETWEEN_TXS = 60000 * 1
+const TIME_BETWEEN_TXS = 60000 * 0.5
 
 const pRetry = require("p-retry")
 
@@ -147,7 +147,7 @@ class FundTest extends Command {
             console.log(" ")
             await _this.sleep(TIME_BETWEEN_TXS) // Sleep for 2 minutes
           },
-          retries: 20 // Retry 5 times
+          retries: 100 // Retry 5 times
         })
 
         console.log(`Successfully funded address ${address}`)
