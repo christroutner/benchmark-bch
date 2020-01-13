@@ -32,7 +32,7 @@ const NUMBER_OF_ADDRESSES = 10
 // Amount of BCH to send to each address.
 const BCH_TO_SEND = 0.00002
 
-const TIME_BETWEEN_TXS = 60000 * 0.5
+const TIME_BETWEEN_TXS = 60000 * 1
 
 const pRetry = require("p-retry")
 
