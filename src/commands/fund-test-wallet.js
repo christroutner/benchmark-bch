@@ -27,7 +27,7 @@ const BITBOX = new config.BCHLIB({
 })
 
 // The number of addresses to fund for the test.
-const NUMBER_OF_ADDRESSES = 10
+const NUMBER_OF_ADDRESSES = 3000
 
 // Amount of BCH to send to each address.
 const BCH_TO_SEND = 0.00002
