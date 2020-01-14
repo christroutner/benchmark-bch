@@ -1,7 +1,7 @@
-# Test 01 - Full Node
+# Test 02 - Indexer
 
 ## Overview
-This test focuses on the full nodes ability to rapidly receive and broadcast new transactions in the face of real-world network conditions.
+This test focuses on the indexers ability to rapidly update its database to reflect the changing state of UTXOs associated with an address.
 
 ## Steps
 
@@ -11,9 +11,9 @@ This test focuses on the full nodes ability to rapidly receive and broadcast new
 
 - Use the `create-wallet` command to create a test wallet. This wallet will be called *uut*.
 
-- Use the `fund-test-wallet` command to stage the *uut* wallet and fund it with the *funding* wallet. Before running the command, edit the following constant variables:
-- `NUMBER_OF_ADDRESSES` should be set to `300` to `30000`, depending the test conditions.
-- `BCH_TO_SEND` should be set to `0.00002`.
+- Use the `fund-test-wallet` command to stage the *uut* wallet and fund it with the *funding* wallet. Before running the command, edit the following constants:
+  - `NUMBER_OF_ADDRESSES` should be set to `10`.
+  - `BCH_TO_SEND` should be set to `0.0004`.
 This will be a long-running command. Wait until it completes and the last transaction is confirmed in a block.
 
 - Set up any monitoring required to record the results on the systems subcomponents. If using Digital Ocean, you can use the 6-hour real-time graphs. Software like [netdata](https://github.com/netdata/netdata) can also be used, or even a command-line metrics software like [glances](https://nicolargo.github.io/glances/).
