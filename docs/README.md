@@ -65,7 +65,7 @@ While all benchmark tests in this repository test the system-as-a-whole, there a
   - A wallet is staged with utxos that have all been confirmed in blocks prior to running the test.
   - No child-utxos are spent. Only staged utxos.
 
-- `indexer-test` generates a series of transactions that spend child-utxos. This test measures the time it takes for an indexer to update its database to reflect the changing state of UTXOs. This variation has following qualities:
+- [`indexer-test`](./test02-indexer.md) generates a series of transactions that spend child-utxos. This test measures the time it takes for an indexer to update its database to reflect the changing state of UTXOs. This variation has following qualities:
   - SLPDB is ignored and tokens are not used.
   - A wallet is staged with 10 UTXOs that have been confirmed in blocks.
   - Each UTXO is spent and its child UTXO spent, up to 20 times.
