@@ -11,16 +11,15 @@ This test focuses on the indexers ability to rapidly update its database to refl
 
 - Use the `create-wallet` command to create a test wallet. This wallet will be called *uut*.
 
-- Use the `fund-test-wallet` command to stage the *uut* wallet and fund it with the *funding* wallet. Before running the command, edit the following constants:
+- Use the `fund-test-wallet` command to stage the *uut* wallet and fund it with the *funding* wallet. This will be a long-running command. Wait until it completes and the last transaction is confirmed in a block. Before running the command, edit the following constants:
   - `NUMBER_OF_ADDRESSES` should be set to `10`.
   - `BCH_TO_SEND` should be set to `0.0004`.
-This will be a long-running command. Wait until it completes and the last transaction is confirmed in a block.
 
 - Set up any monitoring required to record the results on the systems subcomponents. If using Digital Ocean, you can use the 6-hour real-time graphs. Software like [netdata](https://github.com/netdata/netdata) can also be used, or even a command-line metrics software like [glances](https://nicolargo.github.io/glances/).
 
-- Open the `run-node-test` command source file and edit the `NUMBER_OF_ADDRESSES` and `TIME_BETWEEN_TXS` constants to set the speed and duration of the test. Make a note of the values used.
+- Open the `run-indexer-test` command source file and edit the `NUMBER_OF_ADDRESSES` and `TIME_BETWEEN_TXS` constants to set the speed and duration of the test. Make a note of the values used.
 
-- Execute the `run-node-test` command to execute the test, while monitoring the performance of each subcomponent.
+- Execute the `run-indexer-test` command to execute the test, while monitoring the performance of each subcomponent.
 
 ## Data
 

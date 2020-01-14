@@ -11,10 +11,9 @@ This test focuses on the full nodes ability to rapidly receive and broadcast new
 
 - Use the `create-wallet` command to create a test wallet. This wallet will be called *uut*.
 
-- Use the `fund-test-wallet` command to stage the *uut* wallet and fund it with the *funding* wallet. Before running the command, edit the following constant variables:
+- Use the `fund-test-wallet` command to stage the *uut* wallet and fund it with the *funding* wallet. This will be a long-running command. Wait until it completes and the last transaction is confirmed in a block. Before running the command, edit the following constant variables:
   - `NUMBER_OF_ADDRESSES` should be set to `300` to `30000`, depending the test conditions.
   - `BCH_TO_SEND` should be set to `0.00002`.
-This will be a long-running command. Wait until it completes and the last transaction is confirmed in a block.
 
 - Set up any monitoring required to record the results on the systems subcomponents. If using Digital Ocean, you can use the 6-hour real-time graphs. Software like [netdata](https://github.com/netdata/netdata) can also be used, or even a command-line metrics software like [glances](https://nicolargo.github.io/glances/).
 
