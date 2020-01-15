@@ -26,13 +26,18 @@ const BITBOX = new config.BCHLIB({
   apiToken: config.JWT
 })
 
+// FULL NODE TEST
 // The number of addresses to fund for the test.
-const NUMBER_OF_ADDRESSES = 3000
-
+// const NUMBER_OF_ADDRESSES = 3000
 // Amount of BCH to send to each address.
-const BCH_TO_SEND = 0.00002
+// const BCH_TO_SEND = 0.00002
 
-const TIME_BETWEEN_TXS = 60000 * 0.5
+// INDEXER TEST
+const NUMBER_OF_ADDRESSES = 10
+const BCH_TO_SEND = 0.0004
+
+const TIME_BETWEEN_TXS = 60000 * 0.5 // 30 seconds
+const RETRY_CUT_OFF = 100
 
 const pRetry = require("p-retry")
 
@@ -147,7 +152,7 @@ class FundTest extends Command {
             console.log(" ")
             await _this.sleep(TIME_BETWEEN_TXS) // Sleep for 2 minutes
           },
-          retries: 100 // Retry 5 times
+          retries: RETRY_CUT_OFF
         })
 
         console.log(`Successfully funded address ${address}`)
