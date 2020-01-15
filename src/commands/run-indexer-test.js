@@ -1,6 +1,6 @@
 /*
   Reference:
-  https://docs.google.com/document/d/1qtleJjNQ7b8v--RBEN17p56HqtHf9j4Bvtap4YRLXBs/edit#heading=h.vjv6nnxj3xmw
+  https://github.com/christroutner/benchmark-bch/blob/master/docs/test02-indexer.md
 
   This command runs the test defined in the document above.
 */
@@ -44,9 +44,9 @@ let _this
 
 // Counters for tracking metrics during the test.
 let errorCnt = 0
-let txCnt = 0
+const txCnt = 0
 
-class FundTest extends Command {
+class IndexerTest extends Command {
   constructor(argv, config) {
     super(argv, config)
     //_this = this
@@ -67,7 +67,7 @@ class FundTest extends Command {
 
   async run() {
     try {
-      const { flags } = this.parse(FundTest)
+      const { flags } = this.parse(IndexerTest)
 
       // Ensure flags meet qualifiying critieria.
       this.validateFlags(flags)
@@ -98,6 +98,20 @@ class FundTest extends Command {
         this.send.BITBOX = this.BITBOX
       }
 
+      // Update balances before sending.
+      this.walletInfo = await this.updateBalances.updateBalances(flags)
+
+      //
+      const isValid = await this.verifyTestWallet()
+      if (!isValid) {
+        console.log(
+          `Test wallet does not meet the criteria listed in the testing docs.`
+        )
+      } else {
+        console.log(`Test wallet has been validated.`)
+      }
+      return
+      /*
       // Generate addresses from the test wallet.
       const addresses = await this.generateAddresses(
         sourceWalletInfo,
@@ -127,8 +141,9 @@ class FundTest extends Command {
       }
 
       console.log(`test complete. txCnt: ${txCnt}, errorCnt: ${errorCnt}`)
+      */
     } catch (err) {
-      // console.log(`Error in fundTestWallet()`)
+      console.log(`Error in runTest(): `, err)
       // throw err
       errorCnt++
     }
@@ -137,6 +152,32 @@ class FundTest extends Command {
   // Promise-based sleep function.
   sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  // Validates the test wallet. Ensures it's properly staged to run the index
+  // test.
+  async verifyTestWallet() {
+    try {
+      let validUtxoCnt = 0
+
+      const hasBalance = this.walletInfo.hasBalance
+      // console.log(`hasBalance: ${JSON.stringify(hasBalance, null, 2)}`)
+
+      // Loop through each entry in the hasBalance array.
+      for (let i = 0; i < hasBalance.length; i++) {
+        const thisAddr = hasBalance[i]
+
+        if (thisAddr.balance >= 0.0004) validUtxoCnt++
+      }
+
+      if (validUtxoCnt < 10) return false
+
+      console.log(`validUtxoCnt = ${validUtxoCnt}`)
+      return true
+    } catch (err) {
+      console.error(`Error in verifyTestWallet()`)
+      throw err
+    }
   }
 
   // Returns a promise that resolves to a txid string
@@ -211,6 +252,7 @@ class FundTest extends Command {
   }
 
   // Generates numOfAddrs addresses from a wallet, starting at index 0.
+  // Generates 200 addresses, starting from nextIndex
   // Returns the addresses as an array of strings.
   async generateAddresses(walletInfo, numOfAddrs) {
     try {
@@ -267,23 +309,22 @@ class FundTest extends Command {
   }
 }
 
-FundTest.description = `Runs the benchmark test
+IndexerTest.description = `Runs the benchmark indexer-test
 ...
 This command assumes that the wallet has been prepped to run the test by first
 running these commands:
 - fund-test-wallet
-- tokenize-test-wallet
 - update-balances
 
 After running the above commands in that order, the wallet will then be prepared
 to run this command, which executes the benchmark test.
 `
 
-FundTest.flags = {
+IndexerTest.flags = {
   name: flags.string({
     char: "n",
     description: "source wallet name to source funds"
   })
 }
 
-module.exports = FundTest
+module.exports = IndexerTest
