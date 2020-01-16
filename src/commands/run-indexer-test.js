@@ -32,7 +32,7 @@ const BITBOX = new config.BCHLIB({
 // The number of addresses to fund for the test.
 const NUMBER_OF_ADDRESSES = 200
 
-const TIME_BETWEEN_TXS = 1000 // time in milliseconds
+const TIME_BETWEEN_TXS = 250 // time in milliseconds
 
 // const pRetry = require("p-retry")
 
@@ -93,8 +93,9 @@ class IndexerTest extends Command {
 
       const avg = accum / this.testResults.length
 
+      console.log(" ")
       console.log(`Tests run: ${this.testResults.length}`)
-      console.log(`Average time: ${avg}`)
+      console.log(`Average time: ${avg} milliseconds`)
     } catch (err) {
       console.error(`Error in calcResults().`)
       throw err
@@ -183,8 +184,8 @@ class IndexerTest extends Command {
               this.testResults.push(duration)
 
               console.log(
-                `Completed TX ${i *
-                  j}. Time between success txs: ${duration} milliseconds.`
+                `Completed TX ${addrCnt +
+                  1}. Time between success txs: ${duration} milliseconds.`
               )
               console.log(" ")
               console.log(" ")
@@ -192,11 +193,11 @@ class IndexerTest extends Command {
               // Exit the loop
               txComplete = true
             } catch (err) {
-              if (err) {
-                console.log(
-                  `Error trying to generate transaction: ${err.message}`
-                )
-              }
+              // if (err) {
+              //   console.log(
+              //     `Error trying to generate transaction: ${err.message}`
+              //   )
+              // }
             }
 
             await this.sleep(TIME_BETWEEN_TXS)
@@ -209,7 +210,11 @@ class IndexerTest extends Command {
           addrCnt++
           addrData = addresses[addrCnt]
 
-          if (!addrData) return
+          // Exit the loop once we run out of addresses.
+          if (!addrData) {
+            // console.log(`Exiting loop due to !addrData`)
+            return
+          }
 
           destAddr = addrData.address
         }
@@ -266,20 +271,22 @@ class IndexerTest extends Command {
   }
 
   // Returns a promise that resolves to a txid string
-  // This function runs a series of commands that correspond to the transaction
-  // model in the appendix 2 of the test document.
-  // async generateTx(walletInfo, addr, walletIndex) {
+  // This function expects 1 UTXO in the sourceAddr, and it spends that UTXO
+  // completely to the destAddr. sourceIndex is the HD wallet index for the
+  // sourceAddr.
   async generateTx(sourceAddr, sourceIndex, destAddr) {
     try {
       // Get the address balance
-      const balance = await _this.BITBOX.Blockbook.balance(sourceAddr)
-      console.log(
-        `BCH balance for source address ${sourceAddr}: ${balance.balance}`
-      )
+      // const balance = await _this.BITBOX.Blockbook.balance(sourceAddr)
+      // console.log(
+      //   `BCH balance for source address ${sourceAddr}: ${balance.balance}`
+      // )
 
       // Get utxos
       const utxos = await _this.BITBOX.Blockbook.utxo(sourceAddr)
-      console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
+      // console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
+
+      if (utxos.length === 0) throw new Error(`No UTXOs found`)
 
       // Select optimal BCH UTXO
       // const utxo = await _this.send.selectUTXO(0.00001, utxos)
@@ -297,10 +304,10 @@ class IndexerTest extends Command {
 
       // return txid
     } catch (err) {
-      console.log(
-        `Error in run-test.js/generateTx for address ${sourceAddr}: `,
-        err
-      )
+      // console.log(
+      //   `Error in run-test.js/generateTx for address ${sourceAddr}: `,
+      //   err
+      // )
       // throw new Error(`Error caught in generateTx()`)
       throw err
     }

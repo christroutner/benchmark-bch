@@ -36,7 +36,8 @@ const BITBOX = new config.BCHLIB({
 const NUMBER_OF_ADDRESSES = 10
 const BCH_TO_SEND = 0.0004
 
-const TIME_BETWEEN_TXS = 60000 * 0.5 // 30 seconds
+const TIME_BETWEEN_TXS = 10000 // 10 seconds
+// const TIME_BETWEEN_TXS = 60000 * 0.5 // 30 seconds
 const RETRY_CUT_OFF = 100
 
 const pRetry = require("p-retry")
