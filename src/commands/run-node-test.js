@@ -163,13 +163,6 @@ class NodeTest extends Command {
         return
       }
 
-      // Pad the test with extra calls to make it more closely resemble the
-      // 'ideal' transaction from the test document.
-      // await _this.BITBOX.Blockbook.balance(addr)
-      // await _this.BITBOX.SLP.Utils.balancesForAddress(addr)
-      // await _this.BITBOX.Blockbook.utxo(addr)
-      // await _this.BITBOX.Blockbook.utxo(addr)
-
       // For now, change is sent to the root address of the source wallet.
       const changeAddr = walletInfo.rootAddress
 

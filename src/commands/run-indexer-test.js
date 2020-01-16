@@ -30,13 +30,11 @@ const BITBOX = new config.BCHLIB({
 })
 
 // The number of addresses to fund for the test.
-const NUMBER_OF_ADDRESSES = 300
-
-const TOKEN_ID = `e0f65c4336cdf90589600e34bcf99c77e9a6e0c7d2d3e266c8f4ab9a5383938e`
+const NUMBER_OF_ADDRESSES = 200
 
 const TIME_BETWEEN_TXS = 1000 // time in milliseconds
 
-const pRetry = require("p-retry")
+// const pRetry = require("p-retry")
 
 const { Command, flags } = require("@oclif/command")
 
@@ -62,6 +60,8 @@ class IndexerTest extends Command {
 
     this.sendTokens = sendTokens
 
+    this.testResults = []
+
     _this = this
   }
 
@@ -76,8 +76,28 @@ class IndexerTest extends Command {
 
       // Fund the wallet
       await this.runTest(flags)
+
+      // Calculate the test results.
+      this.calcResults()
     } catch (err) {
       console.log(`Error in fund-test-wallet: `, err)
+    }
+  }
+
+  // Calcultate the results of the test by averaging the results array.
+  calcResults() {
+    try {
+      let accum = 0
+      for (let i = 0; i < this.testResults.length; i++)
+        accum += this.testResults[i]
+
+      const avg = accum / this.testResults.length
+
+      console.log(`Tests run: ${this.testResults.length}`)
+      console.log(`Average time: ${avg}`)
+    } catch (err) {
+      console.error(`Error in calcResults().`)
+      throw err
     }
   }
 
@@ -101,17 +121,16 @@ class IndexerTest extends Command {
       // Update balances before sending.
       this.walletInfo = await this.updateBalances.updateBalances(flags)
 
-      //
-      const isValid = await this.verifyTestWallet()
-      if (!isValid) {
+      // Validate that the wallet under test and been setup correctly.
+      const utxos = await this.verifyTestWallet()
+      if (!utxos) {
         console.log(
           `Test wallet does not meet the criteria listed in the testing docs.`
         )
       } else {
         console.log(`Test wallet has been validated.`)
       }
-      return
-      /*
+
       // Generate addresses from the test wallet.
       const addresses = await this.generateAddresses(
         sourceWalletInfo,
@@ -119,29 +138,82 @@ class IndexerTest extends Command {
       )
       console.log(`addresses: ${JSON.stringify(addresses, null, 2)}`)
 
-      // Loop through each address and generate a transaction for each one.
-      // Add each transaction to a queue with automatic retry.
-      for (let i = 0; i < addresses.length; i++) {
-        // for (let i = 0; i < 4; i++) {
-        try {
-          const address = addresses[i]
+      console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
 
-          const txid = await this.generateTx(sourceWalletInfo, address, i)
-          console.log(`Tokens sent with TXID: ${txid}`)
+      // Will iterate through the 200 addresses generated.
+      let addrCnt = 0
 
-          await _this.sleep(TIME_BETWEEN_TXS) // Sleep between txs.
-          console.log(" ")
+      // Loop through each of the staged UTXOs.
+      for (let i = 0; i < utxos.length; i++) {
+        // values used by generateTx()
+        // values set in j-for loop are overridden here.
+        let sourceAddr = utxos[i].cashAddress
+        let sourceIndex = utxos[i].index
 
-          txCnt++
-        } catch (err) {
-          console.log(`Error on iteration ${i}`)
-          errorCnt++
-          continue
+        // Spend each utxo 20 times.
+        for (let j = 0; j < 20; j++) {
+          // Set the destination address.
+          let addrData = addresses[addrCnt]
+          let destAddr = addrData.address
+
+          // Mark the time.
+          let startTime = new Date()
+          startTime = startTime.getTime()
+
+          // Loop until the transaction completes.
+          let txComplete = false
+          while (!txComplete) {
+            try {
+              const hex = await this.generateTx(
+                sourceAddr,
+                sourceIndex,
+                destAddr
+              )
+              // console.log(`hex: ${hex}`)
+
+              const txid = await this.appUtils.broadcastTx(hex)
+              console.log(`txid: ${txid}`)
+
+              // Calculate the time between successful txs.
+              let endTime = new Date()
+              endTime = endTime.getTime()
+              const duration = endTime - startTime
+
+              // Record the test results.
+              this.testResults.push(duration)
+
+              console.log(
+                `Completed TX ${i *
+                  j}. Time between success txs: ${duration} milliseconds.`
+              )
+              console.log(" ")
+              console.log(" ")
+
+              // Exit the loop
+              txComplete = true
+            } catch (err) {
+              if (err) {
+                console.log(
+                  `Error trying to generate transaction: ${err.message}`
+                )
+              }
+            }
+
+            await this.sleep(TIME_BETWEEN_TXS)
+          }
+
+          // Prepare for the next iteration
+          sourceAddr = destAddr
+          sourceIndex = addrData.index
+
+          addrCnt++
+          addrData = addresses[addrCnt]
+
+          if (!addrData) return
+
+          destAddr = addrData.address
         }
       }
-
-      console.log(`test complete. txCnt: ${txCnt}, errorCnt: ${errorCnt}`)
-      */
     } catch (err) {
       console.log(`Error in runTest(): `, err)
       // throw err
@@ -155,10 +227,12 @@ class IndexerTest extends Command {
   }
 
   // Validates the test wallet. Ensures it's properly staged to run the index
-  // test.
+  // test. Returns false if wallet does not meet criteria. Returns an array
+  // of UTXOs if it does meet the criteria.
   async verifyTestWallet() {
     try {
       let validUtxoCnt = 0
+      const testUtxos = []
 
       const hasBalance = this.walletInfo.hasBalance
       // console.log(`hasBalance: ${JSON.stringify(hasBalance, null, 2)}`)
@@ -167,13 +241,24 @@ class IndexerTest extends Command {
       for (let i = 0; i < hasBalance.length; i++) {
         const thisAddr = hasBalance[i]
 
-        if (thisAddr.balance >= 0.0004) validUtxoCnt++
+        if (thisAddr.balance >= 0.0004) {
+          validUtxoCnt++
+
+          const utxos = await this.BITBOX.Blockbook.utxo(thisAddr.cashAddress)
+
+          // Assumption: each address has only one UTXO and it is the one for testing.
+          const utxo = utxos[0]
+          utxo.index = thisAddr.index
+          utxo.cashAddress = thisAddr.cashAddress
+
+          testUtxos.push(utxo)
+        }
       }
 
       if (validUtxoCnt < 10) return false
 
       console.log(`validUtxoCnt = ${validUtxoCnt}`)
-      return true
+      return testUtxos
     } catch (err) {
       console.error(`Error in verifyTestWallet()`)
       throw err
@@ -183,76 +268,117 @@ class IndexerTest extends Command {
   // Returns a promise that resolves to a txid string
   // This function runs a series of commands that correspond to the transaction
   // model in the appendix 2 of the test document.
-  async generateTx(walletInfo, addr, walletIndex) {
+  // async generateTx(walletInfo, addr, walletIndex) {
+  async generateTx(sourceAddr, sourceIndex, destAddr) {
     try {
       // Get the address balance
-      const balance = await _this.BITBOX.Blockbook.balance(addr)
-      console.log(`BCH balance for address ${addr}: ${balance.balance}`)
-
-      // Get the SLP balance for the address.
-      const tokenBalance = await _this.BITBOX.SLP.Utils.balancesForAddress(addr)
-      // console.log(`token balance: ${JSON.stringify(tokenBalance, null, 2)}`)
-      console.log(`token balance: ${tokenBalance[0].balance}`)
+      const balance = await _this.BITBOX.Blockbook.balance(sourceAddr)
+      console.log(
+        `BCH balance for source address ${sourceAddr}: ${balance.balance}`
+      )
 
       // Get utxos
-      const utxos = await _this.BITBOX.Blockbook.utxo(addr)
-      // console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
-
-      // Get a list of token UTXOs from the wallet for this token.
-      // const tokenUtxos = _this.sendTokens.getTokenUtxos(TOKEN_ID, walletInfo)
-      let tokenUtxos = await _this.BITBOX.SLP.Utils.tokenUtxoDetails(utxos)
-      tokenUtxos = tokenUtxos.filter(x => x)
-      tokenUtxos[0].hdIndex = walletIndex // Expected by sendTokens()
-      // console.log(`tokenUtxos: ${JSON.stringify(tokenUtxos, null, 2)}`)
+      const utxos = await _this.BITBOX.Blockbook.utxo(sourceAddr)
+      console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
 
       // Select optimal BCH UTXO
-      const utxo = await _this.send.selectUTXO(0.00001, utxos)
-      utxo.hdIndex = walletIndex // Expected by sendTokens()
+      // const utxo = await _this.send.selectUTXO(0.00001, utxos)
+      const utxo = utxos[0] // Assuming a single utxo.
+      utxo.hdIndex = sourceIndex
       // console.log(`selected utxo: ${JSON.stringify(utxo, null, 2)}`)
 
       if (!utxo.txid) throw new Error(`No valid UTXO could be found`)
 
-      // Exit if there is no UTXO big enough to fulfill the transaction.
-      if (!utxo.amount) {
-        this.log(
-          `Could not find a UTXO big enough for this transaction. More BCH needed.`
-        )
-        return
-      }
+      // Send the BCH
+      const hex = await _this.sendBch(utxo, destAddr)
+      return hex
 
-      // Pad the test with extra calls to make it more closely resemble the
-      // 'ideal' transaction from the test document.
-      await _this.BITBOX.Blockbook.balance(addr)
-      await _this.BITBOX.SLP.Utils.balancesForAddress(addr)
-      await _this.BITBOX.Blockbook.utxo(addr)
-      await _this.BITBOX.Blockbook.utxo(addr)
+      // const txid = await _this.appUtils.broadcastTx(hex)
 
-      // For now, change is sent to the root address of the source wallet.
-      const changeAddr = walletInfo.rootAddress
-
-      // Send the token, transfer change to the new address
-      const hex = await _this.sendTokens.sendTokens(
-        utxo,
-        1,
-        changeAddr,
-        addr,
-        walletInfo,
-        tokenUtxos
-      )
-      // console.log(`hex: ${hex}`)
-
-      const txid = await _this.appUtils.broadcastTx(hex)
-
-      return txid
+      // return txid
     } catch (err) {
-      console.log(`Error in run-test.js/generateTx for address ${addr}: `, err)
+      console.log(
+        `Error in run-test.js/generateTx for address ${sourceAddr}: `,
+        err
+      )
       // throw new Error(`Error caught in generateTx()`)
       throw err
     }
   }
 
-  // Generates numOfAddrs addresses from a wallet, starting at index 0.
-  // Generates 200 addresses, starting from nextIndex
+  // Sends the entire amount of a utxo to a destination address.
+  async sendBch(utxo, destAddr) {
+    try {
+      //console.log(`utxo: ${util.inspect(utxo)}`)
+
+      // instance of transaction builder
+      let transactionBuilder
+      if (this.walletInfo.network === `testnet`)
+        transactionBuilder = new this.BITBOX.TransactionBuilder("testnet")
+      else transactionBuilder = new this.BITBOX.TransactionBuilder()
+
+      const originalAmount = utxo.satoshis
+
+      const vout = utxo.vout
+      const txid = utxo.txid
+
+      // add input with txid and index of vout
+      transactionBuilder.addInput(txid, vout)
+
+      // get byte count to calculate fee. paying 1 sat/byte
+      const byteCount = this.BITBOX.BitcoinCash.getByteCount(
+        { P2PKH: 1 },
+        { P2PKH: 1 }
+      )
+      //console.log(`byteCount: ${byteCount}`)
+      const satoshisPerByte = 1.1
+      const txFee = Math.floor(satoshisPerByte * byteCount)
+      //console.log(`txFee: ${txFee} satoshis\n`)
+
+      // amount to send back to the sending address. It's the original amount - 1 sat/byte for tx size
+      const satoshisToSend = originalAmount - txFee
+      //console.log(`remainder: ${remainder}`)
+
+      // add output w/ address and amount to send
+      transactionBuilder.addOutput(
+        this.BITBOX.Address.toLegacyAddress(destAddr),
+        satoshisToSend
+      )
+
+      // Generate a keypair from the change address.
+      const change = await this.appUtils.changeAddrFromMnemonic(
+        this.walletInfo,
+        utxo.hdIndex
+      )
+      //console.log(`change: ${JSON.stringify(change, null, 2)}`)
+      const keyPair = this.BITBOX.HDNode.toKeyPair(change)
+
+      // Sign the transaction with the HD node.
+      let redeemScript
+      transactionBuilder.sign(
+        0,
+        keyPair,
+        redeemScript,
+        transactionBuilder.hashTypes.SIGHASH_ALL,
+        originalAmount
+      )
+
+      // build tx
+      const tx = transactionBuilder.build()
+
+      // output rawhex
+      const hex = tx.toHex()
+      //console.log(`Transaction raw hex: `)
+      //console.log(hex)
+
+      return hex
+    } catch (err) {
+      console.error(`Error in sendBch()`)
+      throw err
+    }
+  }
+
+  // Generates numOfAddrs addresses from a wallet, starting at nextAddress.
   // Returns the addresses as an array of strings.
   async generateAddresses(walletInfo, numOfAddrs) {
     try {
@@ -279,16 +405,25 @@ class IndexerTest extends Command {
         `m/44'/${walletInfo.derivation}'/0'`
       )
 
+      const startIndex = walletInfo.nextAddress
+      const stopIndex = walletInfo.nextAddress + numOfAddrs
+      console.log(`Generating ${numOfAddrs} addresses.`)
+
       const addrs = []
-      for (let i = 0; i < numOfAddrs; i++) {
+      for (let i = startIndex; i < stopIndex; i++) {
         // derive an external change address HDNode
         const change = this.BITBOX.HDNode.derivePath(account, `0/${i}`)
 
         // get the cash address
         const newAddress = this.BITBOX.HDNode.toCashAddress(change)
 
+        const addrObj = {
+          index: i,
+          address: newAddress
+        }
+
         // Add the address to the array
-        addrs.push(newAddress)
+        addrs.push(addrObj)
       }
 
       return addrs
