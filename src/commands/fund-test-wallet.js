@@ -82,7 +82,7 @@ class FundTest extends Command {
         console.log(`Preparing wallet for a full-node (non-SLP) test.`)
         // FULL NODE TEST
         // The number of addresses to fund for the test.
-        NUMBER_OF_ADDRESSES = 3000
+        NUMBER_OF_ADDRESSES = 300
         // Amount of BCH to send to each address.
         BCH_TO_SEND = 0.00002
       } else {
