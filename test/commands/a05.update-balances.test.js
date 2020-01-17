@@ -234,9 +234,13 @@ describe("#update-balances.js", () => {
         0,
         3
       )
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
       assert.isArray(result.balances)
       assert.isArray(result.slpUtxos)
+
+      // Ensure the hdIndex is included in the data.
+      assert.property(result.balances[0], "hdIndex")
     })
   })
 
