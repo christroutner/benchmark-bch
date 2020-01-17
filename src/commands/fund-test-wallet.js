@@ -79,12 +79,14 @@ class FundTest extends Command {
 
       const type = flags.type
       if (type === "full-node") {
+        console.log(`Preparing wallet for a full-node (non-SLP) test.`)
         // FULL NODE TEST
         // The number of addresses to fund for the test.
         NUMBER_OF_ADDRESSES = 3000
         // Amount of BCH to send to each address.
         BCH_TO_SEND = 0.00002
       } else {
+        console.log(`Preparing wallet for an indexer (non-SLP) test.`)
         // Indexer test
         NUMBER_OF_ADDRESSES = 10
         BCH_TO_SEND = 0.0004
