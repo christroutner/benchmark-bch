@@ -27,7 +27,7 @@ const BITBOX = new config.BCHLIB({
 })
 
 // The number of addresses to fund for the test.
-const NUMBER_OF_ADDRESSES = 10
+const NUMBER_OF_ADDRESSES = 300
 
 const TIME_BETWEEN_TXS = 1000 // time in milliseconds
 
