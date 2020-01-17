@@ -404,7 +404,8 @@ class UpdateBalances extends Command {
 
       return tokenUtxos
     } catch (err) {
-      console.log(`Error in update-balances.js/findSlpUtxo().`)
+      // console.log(`Error in update-balances.js/findSlpUtxo().`)
+      // console.log(`Error in update-balances.js/findSlpUtxo(): `, err.message)
       throw err
     }
   }
