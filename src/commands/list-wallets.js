@@ -5,7 +5,6 @@
 
 const shelljs = require("shelljs")
 const Table = require("cli-table")
-const qrcode = require("qrcode-terminal")
 
 const util = require("util")
 util.inspect.defaultOptions = {
@@ -67,7 +66,7 @@ class ListWallets extends Command {
   displayTable(data) {
     var table = new Table({
       head: ["Name", "Network", "Balance (BCH)"],
-      colWidths: [15, 15, 15]
+      colWidths: [25, 15, 15]
     })
 
     for (let i = 0; i < data.length; i++) table.push(data[i])
