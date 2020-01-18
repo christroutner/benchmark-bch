@@ -39,7 +39,7 @@ let BCH_TO_SEND = 0.0004
 // const NUMBER_OF_ADDRESSES = 10
 // const BCH_TO_SEND = 0.0004
 
-const TIME_BETWEEN_TXS = 5000 // 10 seconds
+const TIME_BETWEEN_TXS = 1000 // 10 seconds
 // const TIME_BETWEEN_TXS = 60000 * 0.5 // 30 seconds
 const RETRY_CUT_OFF = 1000
 
@@ -209,7 +209,7 @@ class FundTest extends Command {
       // console.log(`send utxos: ${JSON.stringify(utxos, null, 2)}`)
 
       // Select optimal UTXO
-      const utxo = await _this.send.selectUTXO(bch, utxos)
+      const utxo = await _this.send.selectUTXO(bch, utxos, true)
       // console.log(`selected utxo: ${JSON.stringify(utxo, null, 2)}`)
 
       if (!utxo.txid) throw new Error(`No valid UTXO could be found`)
@@ -229,7 +229,8 @@ class FundTest extends Command {
 
       return txid
     } catch (err) {
-      console.log(`Error in fund-test-wallet.js/generateTx: `, err)
+      // console.log(`Error in fund-test-wallet.js/generateTx: `, err)
+      console.log(`Error in fund-test-wallet.js/generateTx: ${err.message}`)
       throw new Error(`Error caught in generateTx()`)
       // throw err
     }
