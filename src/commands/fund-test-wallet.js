@@ -39,7 +39,7 @@ let BCH_TO_SEND = 0.0004
 // const NUMBER_OF_ADDRESSES = 10
 // const BCH_TO_SEND = 0.0004
 
-const TIME_BETWEEN_TXS = 1000 // 10 seconds
+const TIME_BETWEEN_TXS = 1000 // 1 second
 // const TIME_BETWEEN_TXS = 60000 * 0.5 // 30 seconds
 const RETRY_CUT_OFF = 1000
 
@@ -82,7 +82,7 @@ class FundTest extends Command {
         console.log(`Preparing wallet for a full-node (non-SLP) test.`)
         // FULL NODE TEST
         // The number of addresses to fund for the test.
-        NUMBER_OF_ADDRESSES = 10
+        NUMBER_OF_ADDRESSES = 300
         // Amount of BCH to send to each address.
         BCH_TO_SEND = 0.00002
       } else {

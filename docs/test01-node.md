@@ -25,4 +25,29 @@ This test focuses on the full nodes ability to rapidly receive and broadcast new
 
 | Date     | 7-day average TXs per day | NUMBER_OF_ADDRESSES | TIME_BETWEEN_TXS | Notes |
 | -------- | ------------------------- | ------------------- | ---------------- | ----- |
-| 01/12/20 | 48706                     | 300                 | 1000             |       |
+| 01/21/20 | 52022                     | 300                 | 1000             |  2s per tx actual    |
+| 01/21/20 | 52022                     | 300                 | 200             |  750mS per tx actual    |
+
+- Test 1
+  - Date: 01/21/2020
+  - 7-day average TXs per day: 52022
+  - `NUMBER_OF_ADDRESSES`: 300
+  - `TIME_BETWEEN_TXS`: 1000
+  - YouTube Video (link here)
+  - Notes:
+    - Results were closer to 2 seconds per tx.
+    - No significantly measurable change in resource usage during test compared to idle.
+    - Used ABC v0.20.0 running on a Digitial Ocean Droplet with 2 CPU & 4GB of memory.
+    - Used Blockbook v0.3.1
+
+- Test 2
+  - Date: 01/21/2020
+  - 7-day average TXs per day: 52022
+  - `NUMBER_OF_ADDRESSES`: 300
+  - `TIME_BETWEEN_TXS`: 200
+  - YouTube Video (link here)
+  - Notes:
+    - Results were closer to 750 milliseconds per tx.
+    - No significantly measurable change in resource usage during test compared to idle.
+    - Used ABC v0.20.0 running on a Digitial Ocean Droplet with 2 CPU & 4GB of memory.
+    - Used Blockbook v0.3.1
