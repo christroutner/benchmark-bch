@@ -254,7 +254,12 @@ class Send extends Command {
               continue
             }
           } catch (err) {
-            console.log(`Err trying to get mempool ancestors: `, err)
+            if (err.error === "Transaction not in mempool") {
+              //
+              console.log(`UTXO found`)
+            } else {
+              console.log(`Err trying to get mempool ancestors: `, err)
+            }
           }
         }
 
@@ -263,7 +268,8 @@ class Send extends Command {
           candidateUTXO = thisUTXO
           continue
 
-          // Replace the candidate if the current UTXO is closer to the send amount.
+          // Replace the candidate if the current UTXO is closer to the send
+          // amount.
         } else if (candidateUTXO.satoshis > thisUTXO.satoshis) {
           candidateUTXO = thisUTXO
         }

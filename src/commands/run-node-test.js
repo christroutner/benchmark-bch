@@ -55,6 +55,8 @@ class NodeTest extends Command {
 
     this.sendTokens = sendTokens
 
+    this.time = []
+
     _this = this
   }
 
@@ -69,6 +71,9 @@ class NodeTest extends Command {
 
       // Fund the wallet
       await this.runTest(flags)
+
+      // Report test results
+      this.calcResults()
     } catch (err) {
       console.log(`Error in fund-test-wallet: `, err)
     }
@@ -98,6 +103,9 @@ class NodeTest extends Command {
       )
       console.log(`addresses: ${JSON.stringify(addresses, null, 2)}`)
 
+      let startTime = new Date()
+      startTime = startTime.getTime()
+
       // Loop through each address and generate a transaction for each one.
       // Add each transaction to a queue with automatic retry.
       for (let i = 0; i < addresses.length; i++) {
@@ -115,6 +123,11 @@ class NodeTest extends Command {
           console.log(" ")
 
           txCnt++
+
+          // Calculate time between transactions.
+          let endTime = new Date()
+          endTime = endTime.getTime()
+          this.time.push(endTime - starTime)
         } catch (err) {
           console.log(`Error on iteration ${i}`)
           errorCnt++
@@ -228,6 +241,22 @@ class NodeTest extends Command {
     } catch (err) {
       console.log(`Error in generateAddresses()`)
       throw error
+    }
+  }
+
+  // Calcultate the results of the test by averaging the results array.
+  calcResults() {
+    try {
+      let accum = 0
+      for (let i = 0; i < this.time.length; i++) accum += this.time[i]
+
+      const avg = accum / this.time.length
+
+      console.log(" ")
+      console.log(`Average time per transaction: ${avg} milliseconds`)
+    } catch (err) {
+      console.error(`Error in calcResults().`)
+      throw err
     }
   }
 
