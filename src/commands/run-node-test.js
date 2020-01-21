@@ -27,7 +27,7 @@ const BITBOX = new config.BCHLIB({
 })
 
 // The number of addresses to fund for the test.
-const NUMBER_OF_ADDRESSES = 300
+const NUMBER_OF_ADDRESSES = 10
 
 const TIME_BETWEEN_TXS = 1000 // time in milliseconds
 
@@ -103,14 +103,14 @@ class NodeTest extends Command {
       )
       console.log(`addresses: ${JSON.stringify(addresses, null, 2)}`)
 
-      let startTime = new Date()
-      startTime = startTime.getTime()
-
       // Loop through each address and generate a transaction for each one.
       // Add each transaction to a queue with automatic retry.
       for (let i = 0; i < addresses.length; i++) {
         // for (let i = 0; i < 4; i++) {
         try {
+          let startTime = new Date()
+          startTime = startTime.getTime()
+
           const address = addresses[i]
 
           const txid = await this.generateTx(sourceWalletInfo, address, i)
@@ -127,9 +127,9 @@ class NodeTest extends Command {
           // Calculate time between transactions.
           let endTime = new Date()
           endTime = endTime.getTime()
-          this.time.push(endTime - starTime)
+          this.time.push(endTime - startTime)
         } catch (err) {
-          console.log(`Error on iteration ${i}`)
+          console.log(`Error on iteration ${i}: ${err.message}`)
           errorCnt++
           continue
         }
