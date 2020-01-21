@@ -74,6 +74,8 @@ While all benchmark tests in this repository test the system-as-a-whole, there a
   - The wallet repeatedly tries to spend the same UTXO until it succeeds.
   - The time between each successful TX is measured and averaged across the 200 TXs.
 
+### Not yet developed
+
 - `staged-token-test` is similar to the *node-test* but includes the sending of an SLP token. This test forces an SLP indexer to rapidly update its database for a specific token. It's a test of the indexers ability to process sustained and rapid SLP transactions over a period of time.
 
 - `unstaged-token-test` is similar to the *indexer-test* but includes the sending of an SLP token. It tests the average time for an SLP indexer to analyze incoming transactions and update its database.
@@ -90,7 +92,7 @@ This command has been created with automatic retry logic. Approximately 4 minute
 This command has been created with automatic retry logic. Approximately 4 minutes between transactions are used to avoid failure due to the 25-tx limit and other network issues.
 
 
-`run-test` - each wallet sends its token back to itself. It generates a send once per second by default, but the timing is adjustable via constant variables at the top of the code.
+- `run-node-test` - each wallet sends its token back to itself. It generates a send once per second by default, but the timing is adjustable via constant variables at the top of the code.
 
 
-`send-all` - send all BCH to clean up the test wallet and consolidate funds back in the master wallet. Use the -i flag to ignore tokens and spend their dust UTXOs, effectively burning the tokens.
+- `send-all` - send all BCH to clean up the test wallet and consolidate funds back in the master wallet. Use the -i flag to ignore tokens and spend their dust UTXOs, effectively burning the tokens.

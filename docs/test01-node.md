@@ -28,7 +28,7 @@ This test focuses on the full nodes ability to rapidly receive and broadcast new
   - 7-day average TXs per day: 52022
   - `NUMBER_OF_ADDRESSES`: 300
   - `TIME_BETWEEN_TXS`: 1000
-  - YouTube Video (link here)
+  - [YouTube Video](https://youtu.be/tFo8XccrXC0)
   - Notes:
     - Results were closer to 2 seconds per tx.
     - No significantly measurable change in resource usage during test compared to idle.
@@ -41,7 +41,7 @@ This test focuses on the full nodes ability to rapidly receive and broadcast new
   - 7-day average TXs per day: 52022
   - `NUMBER_OF_ADDRESSES`: 300
   - `TIME_BETWEEN_TXS`: 200
-  - YouTube Video (link here)
+  - [YouTube Video](https://youtu.be/7f6BGLCVg-U)
   - Notes:
     - Results were closer to 750 milliseconds per tx.
     - No significantly measurable change in resource usage during test compared to idle.
@@ -54,7 +54,7 @@ This test focuses on the full nodes ability to rapidly receive and broadcast new
   - 7-day average TXs per day: 52022
   - `NUMBER_OF_ADDRESSES`: 3000
   - `TIME_BETWEEN_TXS`: 0
-  - YouTube Video (link here)
+  - [YouTube Video](https://youtu.be/R3erRhCU66Y)
   - Notes:
     - Over 3000 txs, the average time between tx was 433 milliseconds per tx.
     - No significantly measurable change in resource usage during test compared to idle.
