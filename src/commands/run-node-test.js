@@ -29,7 +29,7 @@ const BITBOX = new config.BCHLIB({
 // The number of addresses to fund for the test.
 const NUMBER_OF_ADDRESSES = 300
 
-const TIME_BETWEEN_TXS = 200 // time in milliseconds
+const TIME_BETWEEN_TXS = 250 // time in milliseconds
 
 const { Command, flags } = require("@oclif/command")
 
@@ -120,14 +120,17 @@ class NodeTest extends Command {
 
           // Sleep between txs.
           await _this.sleep(TIME_BETWEEN_TXS)
-          console.log(" ")
 
           txCnt++
 
           // Calculate time between transactions.
           let endTime = new Date()
           endTime = endTime.getTime()
-          this.time.push(endTime - startTime)
+          const timeDiff = endTime - startTime
+          this.time.push(timeDiff)
+          console.log(`TX processing took ${timeDiff} milliseconds`)
+
+          console.log(" ")
         } catch (err) {
           console.log(`Error on iteration ${i}: ${err.message}`)
           errorCnt++
