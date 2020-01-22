@@ -27,9 +27,9 @@ const BITBOX = new config.BCHLIB({
 })
 
 // The number of addresses to fund for the test.
-const NUMBER_OF_ADDRESSES = 10
+const NUMBER_OF_ADDRESSES = 3000
 
-const TIME_BETWEEN_TXS = 1000 // time in milliseconds
+const TIME_BETWEEN_TXS = 0 // time in milliseconds
 
 const { Command, flags } = require("@oclif/command")
 
@@ -55,6 +55,8 @@ class NodeTest extends Command {
 
     this.sendTokens = sendTokens
 
+    this.time = []
+
     _this = this
   }
 
@@ -69,6 +71,9 @@ class NodeTest extends Command {
 
       // Fund the wallet
       await this.runTest(flags)
+
+      // Report test results
+      this.calcResults()
     } catch (err) {
       console.log(`Error in fund-test-wallet: `, err)
     }
@@ -103,6 +108,9 @@ class NodeTest extends Command {
       for (let i = 0; i < addresses.length; i++) {
         // for (let i = 0; i < 4; i++) {
         try {
+          let startTime = new Date()
+          startTime = startTime.getTime()
+
           const address = addresses[i]
 
           const txid = await this.generateTx(sourceWalletInfo, address, i)
@@ -111,12 +119,20 @@ class NodeTest extends Command {
           this.appUtils.displayTxid(txid, sourceWalletInfo.network)
 
           // Sleep between txs.
-          await _this.sleep(TIME_BETWEEN_TXS)
-          console.log(" ")
+          // await _this.sleep(TIME_BETWEEN_TXS)
 
           txCnt++
+
+          // Calculate time between transactions.
+          let endTime = new Date()
+          endTime = endTime.getTime()
+          const timeDiff = endTime - startTime
+          this.time.push(timeDiff)
+          console.log(`TX processing took ${timeDiff} milliseconds`)
+
+          console.log(" ")
         } catch (err) {
-          console.log(`Error on iteration ${i}`)
+          console.log(`Error on iteration ${i}: ${err.message}`)
           errorCnt++
           continue
         }
@@ -228,6 +244,22 @@ class NodeTest extends Command {
     } catch (err) {
       console.log(`Error in generateAddresses()`)
       throw error
+    }
+  }
+
+  // Calcultate the results of the test by averaging the results array.
+  calcResults() {
+    try {
+      let accum = 0
+      for (let i = 0; i < this.time.length; i++) accum += this.time[i]
+
+      const avg = accum / this.time.length
+
+      console.log(" ")
+      console.log(`Average time per transaction: ${avg} milliseconds`)
+    } catch (err) {
+      console.error(`Error in calcResults().`)
+      throw err
     }
   }
 

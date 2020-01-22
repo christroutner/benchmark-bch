@@ -194,7 +194,7 @@ class UpdateBalances extends Command {
           20,
           ignoreTokens
         )
-        // console.log(`thisDataBatch: ${util.inspect(thisDataBatch)}`)
+        // console.log(`thisDataBatch: ${JSON.stringify(thisDataBatch, null, 2)}`)
 
         // Increment the index by 20 (addresses).
         currentIndex += 20
@@ -302,10 +302,17 @@ class UpdateBalances extends Command {
         index,
         limit
       )
-      // console.log(`addresses: ${util.inspect(addresses)}`)
+      // console.log(`index: ${index}, limit: ${limit}`)
+      // console.log(`addresses: ${JSON.stringify(addresses, null, 2)}`)
 
       // get BCH balance and details for each address.
       const balances = await this.BITBOX.Blockbook.balance(addresses)
+
+      // Add the HD Index to each balance.
+      for (let i = 0; i < balances.length; i++) {
+        const hdIndex = index + i
+        balances[i].hdIndex = hdIndex
+      }
       // console.log(`balances: ${JSON.stringify(balances, null, 2)}`)
 
       // get SLP utxo information for the addresses
@@ -404,7 +411,8 @@ class UpdateBalances extends Command {
 
       return tokenUtxos
     } catch (err) {
-      console.log(`Error in update-balances.js/findSlpUtxo().`)
+      // console.log(`Error in update-balances.js/findSlpUtxo().`)
+      // console.log(`Error in update-balances.js/findSlpUtxo(): `, err.message)
       throw err
     }
   }
@@ -412,52 +420,53 @@ class UpdateBalances extends Command {
   // Generates the data that will be stored in the hasBalance array of the
   // wallet JSON file.
   async generateHasBalance(addressData, walletInfo) {
-    const hasBalance = []
+    try {
+      const hasBalance = []
 
-    // Loop through each HD address index
-    for (var i = 0; i < addressData.length; i++) {
-      const thisAddr = addressData[i]
+      // Enable backward-compatible wallets by adding an addresses property,
+      // if it's missing.
+      if (walletInfo.addresses === undefined) walletInfo.addresses = []
 
-      // If the address has a balance, add it to the hasBalance array.
-      if (
-        Number(thisAddr.balance) > 0 ||
-        Number(thisAddr.unconfirmedBalance) > 0
-      ) {
-        // Enable backward-compatible wallets by adding an addresses property.
-        if (walletInfo.addresses === undefined) walletInfo.addresses = []
+      // Loop through each HD address
+      for (var i = 0; i < addressData.length; i++) {
+        const thisAddr = addressData[i]
+        // console.log(`thisAddr: ${JSON.stringify(thisAddr, null, 2)}`)
 
-        // Get the HD Index of the current address.
-        let hdIndex = await this.appUtils.getIndex(thisAddr.address, walletInfo)
+        const hdIndex = thisAddr.hdIndex
 
-        // If the HD index is not found, then attempt to generate it.
-        if (hdIndex === false) {
-          hdIndex = await this.appUtils.generateIndex(
-            thisAddr.address,
-            walletInfo
-          )
+        // If the addresses array does not have the current address, add it.
+        const found = walletInfo.addresses.find(x => x[0] === hdIndex)
+        // console.log(`found: ${JSON.stringify(found, null, 2)}`)
+        if (!found || found.length === 0)
+          walletInfo.addresses.push([hdIndex, thisAddr.address])
+
+        // If the address has a balance, add it to the hasBalance array.
+        if (
+          Number(thisAddr.balance) + Number(thisAddr.unconfirmedBalance) >
+          0
+        ) {
+          const thisObj = {
+            index: hdIndex,
+            balance: this.appUtils.eightDecimals(
+              Number(thisAddr.balance) / SATS_PER_BCH
+            ),
+            balanceSat: Number(thisAddr.balance),
+            unconfirmedBalance: this.appUtils.eightDecimals(
+              Number(thisAddr.unconfirmedBalance) / SATS_PER_BCH
+            ),
+            unconfirmedBalanceSat: Number(thisAddr.unconfirmedBalance),
+            cashAddress: thisAddr.address
+          }
+
+          hasBalance.push(thisObj)
         }
-
-        if (hdIndex === false)
-          throw new Error(`Address ${thisAddr.address} not found!`)
-
-        const thisObj = {
-          index: hdIndex,
-          balance: this.appUtils.eightDecimals(
-            Number(thisAddr.balance) / SATS_PER_BCH
-          ),
-          balanceSat: Number(thisAddr.balance),
-          unconfirmedBalance: this.appUtils.eightDecimals(
-            Number(thisAddr.unconfirmedBalance) / SATS_PER_BCH
-          ),
-          unconfirmedBalanceSat: Number(thisAddr.unconfirmedBalance),
-          cashAddress: thisAddr.address
-        }
-
-        hasBalance.push(thisObj)
       }
-    }
 
-    return hasBalance
+      return hasBalance
+    } catch (err) {
+      console.error(`Error in generateHasBalance().`)
+      throw err
+    }
   }
 
   // Sums the confirmed balances in the hasBalance array to create a single,

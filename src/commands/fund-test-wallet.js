@@ -26,6 +26,9 @@ const BITBOX = new config.BCHLIB({
   apiToken: config.JWT
 })
 
+let NUMBER_OF_ADDRESSES = 10
+let BCH_TO_SEND = 0.0004
+
 // FULL NODE TEST
 // The number of addresses to fund for the test.
 // const NUMBER_OF_ADDRESSES = 3000
@@ -33,12 +36,12 @@ const BITBOX = new config.BCHLIB({
 // const BCH_TO_SEND = 0.00002
 
 // INDEXER TEST
-const NUMBER_OF_ADDRESSES = 10
-const BCH_TO_SEND = 0.0004
+// const NUMBER_OF_ADDRESSES = 10
+// const BCH_TO_SEND = 0.0004
 
-const TIME_BETWEEN_TXS = 10000 // 10 seconds
+const TIME_BETWEEN_TXS = 1000 // 1 second
 // const TIME_BETWEEN_TXS = 60000 * 0.5 // 30 seconds
-const RETRY_CUT_OFF = 100
+const RETRY_CUT_OFF = 1000
 
 const pRetry = require("p-retry")
 
@@ -73,6 +76,21 @@ class FundTest extends Command {
       this.validateFlags(flags)
 
       this.flags = flags
+
+      const type = flags.type
+      if (type === "full-node") {
+        console.log(`Preparing wallet for a full-node (non-SLP) test.`)
+        // FULL NODE TEST
+        // The number of addresses to fund for the test.
+        NUMBER_OF_ADDRESSES = 300
+        // Amount of BCH to send to each address.
+        BCH_TO_SEND = 0.00002
+      } else {
+        console.log(`Preparing wallet for an indexer (non-SLP) test.`)
+        // Indexer test
+        NUMBER_OF_ADDRESSES = 10
+        BCH_TO_SEND = 0.0004
+      }
 
       // Fund the wallet
       await this.fundTestWallet(flags)
@@ -191,7 +209,7 @@ class FundTest extends Command {
       // console.log(`send utxos: ${JSON.stringify(utxos, null, 2)}`)
 
       // Select optimal UTXO
-      const utxo = await _this.send.selectUTXO(bch, utxos)
+      const utxo = await _this.send.selectUTXO(bch, utxos, true)
       // console.log(`selected utxo: ${JSON.stringify(utxo, null, 2)}`)
 
       if (!utxo.txid) throw new Error(`No valid UTXO could be found`)
@@ -211,7 +229,8 @@ class FundTest extends Command {
 
       return txid
     } catch (err) {
-      console.log(`Error in fund-test-wallet.js/generateTx: `, err)
+      // console.log(`Error in fund-test-wallet.js/generateTx: `, err)
+      console.log(`Error in fund-test-wallet.js/generateTx: ${err.message}`)
       throw new Error(`Error caught in generateTx()`)
       // throw err
     }
@@ -274,6 +293,13 @@ class FundTest extends Command {
     if (!dest || dest === "")
       throw new Error(`You must specify a destination wallet with the -d flag.`)
 
+    const type = flags.type
+    if (!type || type === "") {
+      throw new Error(
+        `You must specify the type of test. 'full-node' or 'indexer'`
+      )
+    }
+
     return true
   }
 }
@@ -288,6 +314,11 @@ FundTest.flags = {
   name: flags.string({
     char: "n",
     description: "source wallet name to source funds"
+  }),
+
+  type: flags.string({
+    char: "t",
+    description: "type of test: 'full-node' or 'indexer' "
   }),
 
   dest: flags.string({

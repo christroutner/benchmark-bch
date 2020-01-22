@@ -265,9 +265,9 @@ class AppUtils {
   // Similar to getIndex, except it generates the index through computation rather
   // than simply retrieving it from the wallet file.
   // Returns an integer representing the HD node index of an address. Scans
-  // from 0 to walletInfo.nextAddress.
+  // from indexStart to walletInfo.nextAddress.
   // Returns false if address is not found.
-  async generateIndex(addr, walletInfo) {
+  async generateIndex(addr, walletInfo, indexStart) {
     try {
       let retVal = false
 
@@ -277,7 +277,7 @@ class AppUtils {
       // Generate an array containing all the addresses used by the wallet so far.
       const addresses = await this.generateAddress(
         walletInfo,
-        0,
+        indexStart,
         walletInfo.nextAddress
       )
       // console.log(`addresses: ${JSON.stringify(addresses, null, 2)}`)
@@ -290,7 +290,7 @@ class AppUtils {
 
         // If a match is found, exit the loop and return the value.
         if (addr === thisAddr) {
-          retVal = i
+          retVal = i + indexStart
           break
         }
       }

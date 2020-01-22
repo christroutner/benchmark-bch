@@ -202,8 +202,10 @@ class Send extends Command {
   // 2. The UTXO should be as close to the amount of BCH as possible.
   //    i.e. as small as possible
   // 3. Full node must validate that the UTXO has not been spent.
+  // 4. If the optional tracking Boolean is true, then UTXOs will be tracked and
+  //    rejected for selection if they've been spent 23 times.
   // Returns a single UTXO object.
-  async selectUTXO(bch, utxos) {
+  async selectUTXO(bch, utxos, tracking = false) {
     let candidateUTXO = {}
 
     const bchSatoshis = bch * 100000000
@@ -231,14 +233,43 @@ class Send extends Command {
         }
 
         // Skip if change would less than the dust amount.
-        if (thisUTXO.satoshis - bchSatoshis < 546) continue
+        if (thisUTXO.satoshis - bchSatoshis < 750) continue
+
+        // console.log(`tracking: ${tracking}`)
+
+        // If tracking is set, skip the UTXO is it's been spent too much.
+        if (tracking) {
+          // Wrap in a try/catch so that if an error is thrown, the program will
+          // ignore this code path.
+          try {
+            const ancestors = await this.BITBOX.Blockchain.getMempoolAncestors(
+              thisUTXO.txid
+            )
+            // console.log(`ancestors: ${JSON.stringify(ancestors, null, 2)}`)
+
+            // If the full node returned array with 24 elements, the UTXO
+            // can't be spent.
+            if (Array.isArray(ancestors) && ancestors.length >= 24) {
+              console.log(`25-chained UTXO detected. Skipping UTXO.`)
+              continue
+            }
+          } catch (err) {
+            if (err.error === "Transaction not in mempool") {
+              //
+              console.log(`UTXO found`)
+            } else {
+              console.log(`Err trying to get mempool ancestors: `, err)
+            }
+          }
+        }
 
         // Automatically assign if the candidateUTXO is an empty object.
         if (!candidateUTXO.satoshis) {
           candidateUTXO = thisUTXO
           continue
 
-          // Replace the candidate if the current UTXO is closer to the send amount.
+          // Replace the candidate if the current UTXO is closer to the send
+          // amount.
         } else if (candidateUTXO.satoshis > thisUTXO.satoshis) {
           candidateUTXO = thisUTXO
         }
