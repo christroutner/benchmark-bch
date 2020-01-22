@@ -23,6 +23,32 @@ This test focuses on the indexers ability to rapidly update its database to refl
 
 ## Data
 
-| Date     | 7-day average TXs per day | NUMBER_OF_ADDRESSES | TIME_BETWEEN_TXS | Notes |
-| -------- | ------------------------- | ------------------- | ---------------- | ----- |
-| 01/12/20 | 48706                     | 300                 | 1000             |       |
+- Test 01
+  - Date: 01/21/2020
+  - 7-day average TXs per day: 52022
+  - `NUMBER_OF_ADDRESSES`: 200
+  - `TIME_BETWEEN_TXS`: 250
+  - [YouTube Video](https://youtu.be/z8fwKPAYqf4)
+  - Notes:
+    - Results were 1411 milliseconds per transaction.
+    - No significantly measurable change in resource usage during test compared to idle.
+    - Used ABC v0.20.0 running on a Digital Ocean Droplet with 2 CPU & 4GB of memory.
+    - Used Blockbook v0.3.1 on a Digital Ocean Droplet with 4 CPU and 8GB of memory.
+    - REST API running on a Digital Ocean Droplet with 1 CPU and 2GB of memory.
+
+
+## Requests vs Transactions
+In this test, there are a variable amount of requests per transaction. The indexer is called every `TIME_BETWEEN_TXS` milliseconds for an updated UTXO. When a new UTXO is found, it is spent, and the cycle begins again. Based on the baseline test (01) this resulted in about 6 to 7 calls to Blockbook, then a single call to the Full Node for each transaction.
+
+Typical REST API output per transaction:
+```
+0|start-bitcoincom  | ::ffff:162.243.168.8 - GET /v3/blockbook/utxos/bitcoincash:qzxnyax0pramt2zj2fargjwdsvmex5m40sy9wxxmnq 200 8.693 ms - 2 axios/0.19.1
+0|start-bitcoincom  | ::ffff:162.243.168.8 - GET /v3/blockbook/utxos/bitcoincash:qzxnyax0pramt2zj2fargjwdsvmex5m40sy9wxxmnq 200 7.159 ms - 2 axios/0.19.1
+0|start-bitcoincom  | ::ffff:162.243.168.8 - GET /v3/blockbook/utxos/bitcoincash:qzxnyax0pramt2zj2fargjwdsvmex5m40sy9wxxmnq 200 10.810 ms - 2 axios/0.19.1
+0|start-bitcoincom  | ::ffff:162.243.168.8 - GET /v3/blockbook/utxos/bitcoincash:qzxnyax0pramt2zj2fargjwdsvmex5m40sy9wxxmnq 200 7.243 ms - 2 axios/0.19.1
+0|start-bitcoincom  | ::ffff:162.243.168.8 - GET /v3/blockbook/utxos/bitcoincash:qzxnyax0pramt2zj2fargjwdsvmex5m40sy9wxxmnq 200 9.178 ms - 2 axios/0.19.1
+0|start-bitcoincom  | ::ffff:162.243.168.8 - GET /v3/blockbook/utxos/bitcoincash:qzxnyax0pramt2zj2fargjwdsvmex5m40sy9wxxmnq 200 8.344 ms - 2 axios/0.19.1
+0|start-bitcoincom  | ::ffff:162.243.168.8 - GET /v3/blockbook/utxos/bitcoincash:qzxnyax0pramt2zj2fargjwdsvmex5m40sy9wxxmnq 200 11.897 ms - 137 axios/0.19.1
+0|start-bitcoincom  | ::ffff:162.243.168.8 - POST /v3/rawtransactions/sendRawTransaction 200 10.895 ms - 68 axios/0.19.1
+
+```

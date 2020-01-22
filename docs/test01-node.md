@@ -23,7 +23,7 @@ This test focuses on the full nodes ability to rapidly receive and broadcast new
 
 ## Data
 
-- Test 1
+- Test 01
   - Date: 01/21/2020
   - 7-day average TXs per day: 52022
   - `NUMBER_OF_ADDRESSES`: 300
@@ -32,11 +32,11 @@ This test focuses on the full nodes ability to rapidly receive and broadcast new
   - Notes:
     - Results were closer to 2 seconds per tx.
     - No significantly measurable change in resource usage during test compared to idle.
-    - Used ABC v0.20.0 running on a Digitial Ocean Droplet with 2 CPU & 4GB of memory.
+    - Used ABC v0.20.0 running on a Digital Ocean Droplet with 2 CPU & 4GB of memory.
     - Used Blockbook v0.3.1 on a Digital Ocean Droplet with 4 CPU and 8GB of memory.
     - REST API running on a Digital Ocean Droplet with 1 CPU and 2GB of memory.
 
-- Test 2
+- Test 02
   - Date: 01/21/2020
   - 7-day average TXs per day: 52022
   - `NUMBER_OF_ADDRESSES`: 300
@@ -45,11 +45,11 @@ This test focuses on the full nodes ability to rapidly receive and broadcast new
   - Notes:
     - Results were closer to 750 milliseconds per tx.
     - No significantly measurable change in resource usage during test compared to idle.
-    - Used ABC v0.20.0 running on a Digitial Ocean Droplet with 2 CPU & 4GB of memory.
+    - Used ABC v0.20.0 running on a Digital Ocean Droplet with 2 CPU & 4GB of memory.
     - Used Blockbook v0.3.1 on a Digital Ocean Droplet with 4 CPU and 8GB of memory.
     - REST API running on a Digital Ocean Droplet with 1 CPU and 2GB of memory.
 
-- Test 3
+- Test 03
   - Date: 01/21/2020
   - 7-day average TXs per day: 52022
   - `NUMBER_OF_ADDRESSES`: 3000
@@ -59,7 +59,7 @@ This test focuses on the full nodes ability to rapidly receive and broadcast new
     - Over 3000 txs, the average time between tx was 433 milliseconds per tx.
     - No significantly measurable change in resource usage during test compared to idle.
     - Need to run multiple wallets in parallel to stress the system further.
-    - Used ABC v0.20.0 running on a Digitial Ocean Droplet with 2 CPU & 4GB of memory.
+    - Used ABC v0.20.0 running on a Digital Ocean Droplet with 2 CPU & 4GB of memory.
     - Used Blockbook v0.3.1 on a Digital Ocean Droplet with 4 CPU and 8GB of memory.
     - REST API running on a Digital Ocean Droplet with 1 CPU and 2GB of memory.
 
