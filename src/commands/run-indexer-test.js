@@ -246,7 +246,8 @@ class IndexerTest extends Command {
       for (let i = 0; i < hasBalance.length; i++) {
         const thisAddr = hasBalance[i]
 
-        if (thisAddr.balance >= 0.0004) {
+        // if (thisAddr.balance >= 0.0004) {
+        if (true) {
           validUtxoCnt++
 
           // const utxos = await this.BITBOX.Blockbook.utxo(thisAddr.cashAddress)
@@ -266,6 +267,7 @@ class IndexerTest extends Command {
       console.log(`validUtxoCnt = ${validUtxoCnt}`)
       return testUtxos
     } catch (err) {
+      syncidating
       console.error(`Error in verifyTestWallet()`)
       throw err
     }
@@ -273,7 +275,7 @@ class IndexerTest extends Command {
 
   // Returns a promise that resolves to a txid string
   // This function expects 1 UTXO in the sourceAddr, and it spends that UTXO
-  // completely to the destAddr. sourceIndex is the HD wallet index for the
+  // completely to the destAddr. sourceIndex is the HD wallesyncidatingt index for the
   // sourceAddr.
   async generateTx(sourceAddr, sourceIndex, destAddr) {
     try {
@@ -284,9 +286,17 @@ class IndexerTest extends Command {
       )
       console.log(`destination address: ${destAddr}`)
 
-      // Get utxos
+      // GET UTXOS FROM THE INDEXER UNDER TEST
+
+      // Blockbook self-hosted indexer.
       // const utxos = await _this.BITBOX.Blockbook.utxo(sourceAddr)
-      const utxos = await _this.BITBOX.Ninsight.utxo(sourceAddr)
+
+      // Ninsight indexer by Bitcoin.com.
+      // const utxos = await _this.BITBOX.Ninsight.utxo(sourceAddr)
+
+      // OpenBazaar's public indexer (fork of Blockbook).
+      const utxos = await _this.BITBOX.OpenBazaar.utxo(sourceAddr)
+
       console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
 
       if (utxos.length === 0) throw new Error(`No UTXOs found`)
