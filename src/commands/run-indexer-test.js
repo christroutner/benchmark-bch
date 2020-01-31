@@ -267,7 +267,6 @@ class IndexerTest extends Command {
       console.log(`validUtxoCnt = ${validUtxoCnt}`)
       return testUtxos
     } catch (err) {
-      syncidating
       console.error(`Error in verifyTestWallet()`)
       throw err
     }
