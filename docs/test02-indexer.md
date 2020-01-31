@@ -30,11 +30,24 @@ This test focuses on the indexers ability to rapidly update its database to refl
   - `TIME_BETWEEN_TXS`: 250
   - [YouTube Video](https://youtu.be/z8fwKPAYqf4)
   - Notes:
-    - Results were 1411 milliseconds per transaction.
+    - Results were **1411** milliseconds per transaction.
     - No significantly measurable change in resource usage during test compared to idle.
     - Used ABC v0.20.0 running on a Digital Ocean Droplet with 2 CPU & 4GB of memory.
     - Used Blockbook v0.3.1 on a Digital Ocean Droplet with 4 CPU and 8GB of memory.
     - REST API running on a Digital Ocean Droplet with 1 CPU and 2GB of memory.
+
+  - Test 02
+    - Date: 01/31/2020
+    - 7-day average TXs per day: 45124
+    - `NUMBER_OF_ADDRESSES`: 200
+    - `TIME_BETWEEN_TXS`: 250
+    - [YouTube Video](https://youtu.be/z8fwKPAYqf4)
+    - Notes:
+      - Results were **2050** milliseconds per transaction.
+      - No significantly measurable change in resource usage during test compared to idle.
+      - Used ABC v0.20.0 running on a Digital Ocean Droplet with 2 CPU & 4GB of memory.
+      - Used Blockbook fork run by Open Bazaar's public API as indexer-under-test.
+      - REST API running on a Digital Ocean Droplet with 1 CPU and 2GB of memory.
 
 
 ## Requests vs Transactions
