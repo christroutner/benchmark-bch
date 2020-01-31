@@ -246,12 +246,12 @@ class IndexerTest extends Command {
       for (let i = 0; i < hasBalance.length; i++) {
         const thisAddr = hasBalance[i]
 
-        // if (thisAddr.balance >= 0.0004) {
-        if (true) {
+        if (thisAddr.balance >= 0.0004) {
+          // if (true) {
           validUtxoCnt++
 
-          // const utxos = await this.BITBOX.Blockbook.utxo(thisAddr.cashAddress)
-          const utxos = await this.BITBOX.Ninsight.utxo(thisAddr.cashAddress)
+          const utxos = await this.BITBOX.Blockbook.utxo(thisAddr.cashAddress)
+          // const utxos = await this.BITBOX.Ninsight.utxo(thisAddr.cashAddress)
 
           // Assumption: each address has only one UTXO and it is the one for testing.
           const utxo = utxos[0]
