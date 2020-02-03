@@ -250,8 +250,8 @@ class IndexerTest extends Command {
           // if (true) {
           validUtxoCnt++
 
-          const utxos = await this.BITBOX.Blockbook.utxo(thisAddr.cashAddress)
-          // const utxos = await this.BITBOX.Ninsight.utxo(thisAddr.cashAddress)
+          // const utxos = await this.BITBOX.Blockbook.utxo(thisAddr.cashAddress)
+          const utxos = await this.BITBOX.Ninsight.utxo(thisAddr.cashAddress)
 
           // Assumption: each address has only one UTXO and it is the one for testing.
           const utxo = utxos[0]
@@ -291,10 +291,10 @@ class IndexerTest extends Command {
       // const utxos = await _this.BITBOX.Blockbook.utxo(sourceAddr)
 
       // Ninsight indexer by Bitcoin.com.
-      // const utxos = await _this.BITBOX.Ninsight.utxo(sourceAddr)
+      const utxos = await _this.BITBOX.Ninsight.utxo(sourceAddr)
 
       // OpenBazaar's public indexer (fork of Blockbook).
-      const utxos = await _this.BITBOX.OpenBazaar.utxo(sourceAddr)
+      // const utxos = await _this.BITBOX.OpenBazaar.utxo(sourceAddr)
 
       console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
 

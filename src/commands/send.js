@@ -256,7 +256,7 @@ class Send extends Command {
           } catch (err) {
             if (err.error === "Transaction not in mempool") {
               //
-              console.log(`UTXO found`)
+              // console.log(`UTXO found`)
             } else {
               console.log(`Err trying to get mempool ancestors: `, err)
             }
