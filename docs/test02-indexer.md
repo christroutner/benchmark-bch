@@ -23,7 +23,7 @@ This test focuses on the indexers ability to rapidly update its database to refl
 
 ## Data
 
-- Test 01
+- Test 01 - Blockbook (self hosted)
   - Date: 01/21/2020
   - 7-day average TXs per day: 52022
   - `NUMBER_OF_ADDRESSES`: 200
@@ -36,19 +36,31 @@ This test focuses on the indexers ability to rapidly update its database to refl
     - Used Blockbook v0.3.1 on a Digital Ocean Droplet with 4 CPU and 8GB of memory.
     - REST API running on a Digital Ocean Droplet with 1 CPU and 2GB of memory.
 
-  - Test 02
-    - Date: 01/31/2020
-    - 7-day average TXs per day: 45124
-    - `NUMBER_OF_ADDRESSES`: 200
-    - `TIME_BETWEEN_TXS`: 250
-    - [YouTube Video](https://youtu.be/z8fwKPAYqf4)
-    - Notes:
-      - Results were **2050** milliseconds per transaction.
-      - No significantly measurable change in resource usage during test compared to idle.
-      - Used ABC v0.20.0 running on a Digital Ocean Droplet with 2 CPU & 4GB of memory.
-      - Used Blockbook fork run by Open Bazaar's public API as indexer-under-test.
-      - REST API running on a Digital Ocean Droplet with 1 CPU and 2GB of memory.
+- Test 02 - Open Bazaar (fork of Blockbook)
+  - Date: 01/31/2020
+  - 7-day average TXs per day: 45124
+  - `NUMBER_OF_ADDRESSES`: 200
+  - `TIME_BETWEEN_TXS`: 250
+  - [YouTube Video](https://youtu.be/gTd3tp8dNsA)
+  - Notes:
+    - Results were **2050** milliseconds per transaction.
+    - No significantly measurable change in resource usage during test compared to idle.
+    - Used ABC v0.20.10 running on a Digital Ocean Droplet with 2 CPU & 4GB of memory.
+    - Used Blockbook fork run by Open Bazaar's public API as indexer-under-test.
+    - REST API running on a Digital Ocean Droplet with 1 CPU and 2GB of memory.
 
+- Test 03 - Ninsight (Bitcoin.com indexer)
+  - Date: 02/03/2020
+  - 7-day average TXs per day: 48009
+  - `NUMBER_OF_ADDRESSES`: 200
+  - `TIME_BETWEEN_TXS`: 250
+  - [YouTube Video](https://youtu.be/ItJpMcKD_sQ)
+  - Notes:
+    - Results were **1759** milliseconds per transaction.
+    - No significantly measurable change in resource usage during test compared to idle.
+    - Used ABC v0.20.10 running on a Digital Ocean Droplet with 2 CPU & 4GB of memory.
+    - Used Blockbook fork run by Open Bazaar's public API as indexer-under-test.
+    - REST API running on a Digital Ocean Droplet with 1 CPU and 2GB of memory.
 
 ## Requests vs Transactions
 In this test, there are a variable amount of requests per transaction. The indexer is called every `TIME_BETWEEN_TXS` milliseconds for an updated UTXO. When a new UTXO is found, it is spent, and the cycle begins again. Based on the baseline test (01) this resulted in about 6 to 7 calls to Blockbook, then a single call to the Full Node for each transaction.
